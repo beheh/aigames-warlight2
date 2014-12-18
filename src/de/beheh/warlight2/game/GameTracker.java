@@ -1,9 +1,6 @@
 package de.beheh.warlight2.game;
 
-import de.beheh.warlight2.game.Player;
-import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.game.map.Map;
-import java.util.List;
 
 /**
  *
@@ -73,7 +70,7 @@ public class GameTracker {
 		return startingArmies;
 	}
 
-	protected Map map;
+	protected Map map = new Map();
 
 	public void setMap(Map map) {
 		this.map = map;

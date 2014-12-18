@@ -60,7 +60,6 @@ public class CommunicationHandlerTest {
 	public void testRun() throws IOException {
 		System.out.println("run");
 		GameTracker gameTracker = new GameTracker();
-		gameTracker.setMap(new Map());
 		MockRequestProcessor requestProcessor = new MockRequestProcessor();
 		byte[] input = ("settings timebank 10000\n"
 				+ "settings time_per_move 500\n"
