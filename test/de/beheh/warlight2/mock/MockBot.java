@@ -1,42 +1,36 @@
 package de.beheh.warlight2.mock;
 
-import de.beheh.warlight2.bot.GenericBot;
+import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
-import java.util.Arrays;
+import de.beheh.warlight2.bot.command.NoMovesCommand;
+import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.map.Region;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Benedict Etzel <developer@beheh.de>
  */
-public class MockBot extends GenericBot {
+public class MockBot extends Bot {
 
-	@Override
-	public boolean shouldFailHard() {
-		return true;
+	public MockBot(GameTracker gameTracker) {
+		super(gameTracker);
 	}
-	
-	@Override
-	public void onOpponentMoves() {
+
+	public Region pickStartingRegion(Region[] regions) {
+		return regions[0];
 	}
-	
-	@Override
-	public void onUpdateMap() {
+
+	public List<Command> placeArmies() {
+		List<Command> commands = new ArrayList<>();
+		commands.add(new NoMovesCommand());
+		return commands;
 	}
-	
-	@Override
-	public int onPickStartingRegion(long time, int[] regions) {
-		System.out.println("onPickStartingRegion: " + Arrays.toString(regions));
-		return 0;
-	}
-	
-	@Override
-	public List<Command> onPlaceArmies(long time) {
-		return null;
-	}
-	
-	@Override
-	public List<Command> onAttackTransfer(long time) {
-		return null;
+
+	public List<Command> attackTransfer() {
+		List<Command> commands = new ArrayList<>();
+		commands.add(new NoMovesCommand());
+		return commands;
 	}
 }

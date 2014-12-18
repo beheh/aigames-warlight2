@@ -1,5 +1,6 @@
-package de.beheh.warlight2.map;
+package de.beheh.warlight2.game.map;
 
+import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,5 +49,32 @@ public class Region extends AbstractRegion {
 
 	public boolean isNeighbor(Region neighbor) {
 		return neighbors.contains(neighbor);
+	}
+
+	protected int armycount = 0;
+
+	public void setArmyCount(int armies) {
+		this.armycount = armies;
+	}
+
+	public int getArmyCount() {
+		return armycount;
+	}
+
+	protected Player owner;
+
+	public void setOwner(Player owner) {
+		this.owner = owner;
+	}
+
+	public Player getOwner() {
+		return owner;
+	}
+
+	public int distanceTo(Region region) {
+		if (region.equals(this)) {
+			return 0;
+		}
+		return -1;
 	}
 }

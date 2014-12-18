@@ -1,10 +1,11 @@
 package de.beheh.warlight2;
 
+import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.impl.Quickstep;
 import de.beheh.warlight2.io.CommunicationHandler;
 import de.beheh.warlight2.io.MapHandler;
-import de.beheh.warlight2.map.Map;
+import de.beheh.warlight2.game.map.Map;
 
 /**
  *
@@ -17,11 +18,11 @@ public class Launcher {
 	 */
 	public static void main(String[] args) {
 		try {
-			Bot bot = new Quickstep();
-			Map map = new Map();
-			MapHandler mapHandler = new MapHandler(map);
-			bot.setMap(map);
-			CommunicationHandler communicationHandler = new CommunicationHandler(System.in, System.out, mapHandler, bot);
+			GameTracker gameTracker = new GameTracker();
+			Bot bot = new Quickstep(gameTracker);
+			MapHandler mapHandler = new MapHandler(gameTracker);
+			RequestProcessor requestProcessor = new RequestProcessor(gameTracker, bot);
+			CommunicationHandler communicationHandler = new CommunicationHandler(System.in, System.out, mapHandler, gameTracker, requestProcessor);
 			System.err.println("Launching " + bot.getClass().getSimpleName());
 			communicationHandler.run();
 		} catch (Exception e) {

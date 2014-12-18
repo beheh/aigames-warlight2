@@ -1,7 +1,10 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.map.Map;
+import de.beheh.warlight2.RequestProcessor;
+import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.mock.MockBot;
+import de.beheh.warlight2.mock.MockRequestProcessor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +59,9 @@ public class CommunicationHandlerTest {
 	@Test
 	public void testRun() throws IOException {
 		System.out.println("run");
-		MockBot bot = new MockBot();
+		GameTracker gameTracker = new GameTracker();
+		gameTracker.setMap(new Map());
+		MockRequestProcessor requestProcessor = new MockRequestProcessor();
 		byte[] input = ("settings timebank 10000\n"
 				+ "settings time_per_move 500\n"
 				+ "settings max_rounds 50\n"
@@ -68,13 +73,13 @@ public class CommunicationHandlerTest {
 				+ "setup_map wastelands 3\n"
 				+ "pick_starting_region 10000 2 4\n").getBytes();
 		InputStream stream = new ByteArrayInputStream(input);
-		CommunicationHandler instance = new CommunicationHandler(stream, System.out, new MapHandler(new Map()), bot);
+		CommunicationHandler instance = new CommunicationHandler(stream, System.out, new MapHandler(gameTracker), gameTracker, requestProcessor);
 		instance.run();
-		assertEquals(10000, bot.getTimebank());
-		assertEquals(500, bot.getTimePerMove());
-		assertEquals(50, bot.getMaxRounds());
-		assertEquals("player1", bot.getBotName());
-		assertEquals("player2", bot.getOpponentName());
+		assertEquals(10000, gameTracker.getTimebank());
+		assertEquals(500, gameTracker.getTimePerMove());
+		assertEquals(50, gameTracker.getMaxRounds());
+		assertEquals("player1", gameTracker.getPlayer().getName());
+		assertEquals("player2", gameTracker.getOpponent().getName());
 	}
-
+	
 }

@@ -1,4 +1,4 @@
-package de.beheh.warlight2.map;
+package de.beheh.warlight2.game.map;
 
 /**
  *

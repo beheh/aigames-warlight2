@@ -1,8 +1,8 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.bot.Bot;
+import de.beheh.warlight2.RequestProcessor;
+import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.bot.command.Command;
-import de.beheh.warlight2.bot.command.NoMovesCommand;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,23 +16,25 @@ import java.util.Scanner;
  * @author Benedict Etzel <developer@beheh.de>
  */
 public class CommunicationHandler {
-	
+
 	private final Scanner scanner;
 	private final PrintWriter writer;
 	private final MapHandler mapHandler;
-	private final Bot bot;
-	
-	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, Bot bot) {
+	private final GameTracker gameTracker;
+	private final RequestProcessor requestProcessor;
+
+	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameTracker gameTracker, RequestProcessor requestProcessor) {
 		this.scanner = new Scanner(input);
 		this.writer = new PrintWriter(output);
 		this.mapHandler = mapHandler;
-		this.bot = bot;
+		this.gameTracker = gameTracker;
+		this.requestProcessor = requestProcessor;
 	}
-	
+
 	protected static void assertLength(String[] parts, int length) throws IOException {
 		CommunicationHandler.assertLength(parts, length, 0);
 	}
-	
+
 	protected static void assertLength(String[] parts, int length, int increments) throws IOException {
 		if (parts.length < length || (increments != 0 && (parts.length - length) % increments != 0)) {
 			String multiples = "";
@@ -42,11 +44,11 @@ public class CommunicationHandler {
 			throw new IOException("invalid parameter count (expected " + length + multiples + ", got " + parts.length + ")");
 		}
 	}
-	
+
 	protected static void unknownCommand(String command) throws IOException {
 		throw new IOException("unknown command \"" + command + "\"");
 	}
-	
+
 	protected static int[] castIntegerParameters(String[] array, int from) {
 		int[] list = new int[array.length - from];
 		for (int i = from; i < array.length; i++) {
@@ -54,14 +56,14 @@ public class CommunicationHandler {
 		}
 		return list;
 	}
-	
+
 	public void run() throws IOException {
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.length() == 0) {
 				continue;
 			}
-			
+
 			List<Command> commands = null;
 			String[] parts = line.split(" ");
 			int[] list = null;
@@ -93,7 +95,7 @@ public class CommunicationHandler {
 						break;
 					case "pick_starting_region":
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
-						bot.onPickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2));
+						requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2));
 						break;
 					case "settings":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -101,27 +103,27 @@ public class CommunicationHandler {
 							case "time_bank": // bug in live version
 							case "timebank":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setTimebank(Integer.valueOf(parts[2]));
+								gameTracker.setTimebank(Integer.valueOf(parts[2]));
 								break;
 							case "time_per_move":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setTimePerMove(Integer.valueOf(parts[2]));
+								gameTracker.setTimePerMove(Integer.valueOf(parts[2]));
 								break;
 							case "max_rounds":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setMaxRounds(Integer.valueOf(parts[2]));
+								gameTracker.setMaxRounds(Integer.valueOf(parts[2]));
 								break;
 							case "your_bot":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setBotName(parts[2]);
+								gameTracker.setBotName(parts[2]);
 								break;
 							case "opponent_bot":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setOpponentName(parts[2]);
+								gameTracker.setOpponentName(parts[2]);
 								break;
 							case "starting_armies":
 								CommunicationHandler.assertLength(parts, 3);
-								bot.setStartingArmies(Integer.valueOf(parts[2]));
+								gameTracker.setStartingArmies(Integer.valueOf(parts[2]));
 								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
@@ -130,31 +132,26 @@ public class CommunicationHandler {
 						break;
 					case "update_map":
 						CommunicationHandler.assertLength(parts, 1, 3);
-						bot.onUpdateMap();
+						mapHandler.updateMap(Arrays.copyOfRange(parts, 1, parts.length));
 						break;
 					case "opponent_moves":
 						CommunicationHandler.assertLength(parts, 1, 1);
-						bot.onOpponentMoves();
+						//@todo opponent movement
+						requestProcessor.onOpponentMoves();
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);
 						switch (parts[1]) {
 							case "place_armies":
 								CommunicationHandler.assertLength(parts, 3);
-								commands = bot.onPlaceArmies(Long.valueOf(parts[2]));
-								if (commands == null) {
-									writer.println(new NoMovesCommand(bot));
-								}
+								writer.println(gameTracker.getPlayer().getName() + " " + parts[1] + " " + requestProcessor.placeArmies(Long.valueOf(parts[2])));
 								break;
 							case "attack/transfer":
 								CommunicationHandler.assertLength(parts, 3);
-								commands = bot.onAttackTransfer(Long.valueOf(parts[2]));
-								if (commands == null) {
-									writer.println(new NoMovesCommand(bot));
-								}
+								writer.println(gameTracker.getPlayer().getName() + " " + parts[1] + " " + requestProcessor.attackTransfer(Long.valueOf(parts[2])));
 								break;
 							default:
-								writer.println(new NoMovesCommand(bot));
+								writer.println();
 								CommunicationHandler.unknownCommand(parts[1]);
 								break;
 						}
@@ -164,7 +161,7 @@ public class CommunicationHandler {
 						break;
 				}
 			} catch (IOException e) {
-				if (bot.shouldFailHard()) {
+				if (false) {
 					throw e;
 				}
 				e.printStackTrace(System.err);

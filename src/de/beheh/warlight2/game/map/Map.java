@@ -1,6 +1,6 @@
-package de.beheh.warlight2.map;
+package de.beheh.warlight2.game.map;
 
-import java.util.ArrayList;
+import de.beheh.warlight2.game.Player;
 import java.util.HashMap;
 
 /**
@@ -31,5 +31,15 @@ public class Map {
 
 	public void setRegionAsWasteland(int id) {
 		regions.get(id).setWasteland(true);
+	}
+
+	public void update(int id, Player owner, int armycount) {
+		Region region = regions.get(id);
+		region.setOwner(owner);
+		region.setArmyCount(armycount);
+	}
+	
+	public Region getRegion(int id) {
+		return regions.get(id);
 	}
 }

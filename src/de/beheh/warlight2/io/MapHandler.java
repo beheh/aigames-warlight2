@@ -1,6 +1,8 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.map.Map;
+import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.Player;
+import de.beheh.warlight2.game.map.Map;
 import java.util.Arrays;
 
 /**
@@ -9,21 +11,21 @@ import java.util.Arrays;
  */
 public class MapHandler {
 
-	protected Map map;
+	protected GameTracker gameTracker;
 
-	public MapHandler(Map map) {
-		this.map = map;
+	public MapHandler(GameTracker gameTracker) {
+		this.gameTracker = gameTracker;
 	}
 
 	public void setSuperRegions(int[] parameters) {
 		for (int i = 0; i < parameters.length; i += 2) {
-			map.addSuperRegion(parameters[i], parameters[i + 1]);
+			gameTracker.getMap().addSuperRegion(parameters[i], parameters[i + 1]);
 		}
 	}
 
 	public void setRegions(int[] parameters) {
 		for (int i = 0; i < parameters.length; i += 2) {
-			map.addRegion(parameters[i], parameters[i + 1]);
+			gameTracker.getMap().addRegion(parameters[i], parameters[i + 1]);
 		}
 	}
 
@@ -36,14 +38,23 @@ public class MapHandler {
 				for (int i = 0; i < group.length - 1; i++) {
 					neighbors[i] = Integer.valueOf(group[i + 1]);
 				}
-				map.addNeighbors(region, neighbors);
+				gameTracker.getMap().addNeighbors(region, neighbors);
 			}
 		}
 	}
 
 	public void setWastelands(int[] wastelands) {
 		for (int wasteland : wastelands) {
-			map.setRegionAsWasteland(wasteland);
+			gameTracker.getMap().setRegionAsWasteland(wasteland);
+		}
+	}
+
+	public void updateMap(String[] parameters) {
+		for (int i = 0; i < parameters.length; i += 3) {
+			int region = Integer.valueOf(parameters[i]);
+			Player owner = gameTracker.getPlayer(parameters[i + 1]);
+			int armies = Integer.valueOf(parameters[i + 2]);
+			gameTracker.getMap().update(region, owner, armies);
 		}
 	}
 

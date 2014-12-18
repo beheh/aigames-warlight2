@@ -1,48 +1,34 @@
 package de.beheh.warlight2.bot;
 
+import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.bot.command.Command;
-import de.beheh.warlight2.map.Map;
+import de.beheh.warlight2.game.map.Region;
 import java.util.List;
 
 /**
  *
  * @author Benedict Etzel <developer@beheh.de>
  */
-public interface Bot {
-	
-	/* Internal */
-	
-	public boolean shouldFailHard();
-	
-	public void setMap(Map map);
-	
-	/* Settings */
+public abstract class Bot {
 
-	public void setTimebank(long timebank);
+	public final GameTracker gameTracker;
 
-	public void setTimePerMove(long timePerMove);
+	public Bot(GameTracker gameTracker) {
+		this.gameTracker = gameTracker;
+	}
 
-	public void setMaxRounds(int maxRounds);
+	public final Player getOwner() {
+		return gameTracker.getPlayer();
+	}
 
-	public String getBotName();
+	public abstract Region pickStartingRegion(Region[] regions);
 
-	public void setBotName(String botName);
+	public abstract List<Command> placeArmies();
 
-	public void setOpponentName(String opponentName);
+	public abstract List<Command> attackTransfer();
 
-	public void setStartingArmies(int startingArmies);
+	public void onOpponentMoves() {
 
-	/* Passive callbacks */
-	
-	public void onOpponentMoves();
-
-	public void onUpdateMap();
-
-	/* Active callbacks */
-	
-	public int onPickStartingRegion(long time, int[] regions);
-	
-	public List<Command> onPlaceArmies(long time);
-
-	public List<Command> onAttackTransfer(long time);
+	}
 }
