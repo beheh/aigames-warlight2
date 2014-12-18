@@ -6,6 +6,10 @@ package de.beheh.warlight2.bot.command;
  */
 public class NoMovesCommand extends Command {
 
+	public NoMovesCommand() {
+		super(null);
+	}
+
 	@Override
 	public String toString() {
 		return "No moves";

@@ -25,23 +25,12 @@ public class RequestProcessor {
 		this.bot = bot;
 	}
 
-	protected String mergeCommands(List<Command> commands) {
-		StringBuilder builder = new StringBuilder();
-		if (commands != null && commands.size() > 0) {
-			Iterator<Command> iterator = commands.iterator();
-			boolean first = true;
-			while (iterator.hasNext()) {
-				if (!first) {
-					builder.append(", ");
-				} else {
-					first = false;
-				}
-				builder.append(iterator.next().toString());
-			}
+	protected String commandToString(Command command) {
+		if (command != null) {
+			return command.toString();
 		} else {
-			builder.append(new NoMovesCommand().toString());
+			return new NoMovesCommand().toString();
 		}
-		return builder.toString();
 	}
 
 	public String pickStartingRegion(Long time, int[] regionIds) {
@@ -56,11 +45,11 @@ public class RequestProcessor {
 
 	public String placeArmies(Long time) {
 		gameTracker.nextRound();
-		return this.mergeCommands(bot.placeArmies());
+		return commandToString(bot.placeArmies(gameTracker.getStartingArmies()));
 	}
 
 	public String attackTransfer(Long time) {
-		return this.mergeCommands(bot.attackTransfer());
+		return commandToString(bot.attackTransfer());
 	}
 
 	public void opponentMoves() {

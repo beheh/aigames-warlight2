@@ -24,9 +24,9 @@ public abstract class Bot {
 
 	public abstract Region pickStartingRegion(Region[] regions);
 
-	public abstract List<Command> placeArmies();
+	public abstract Command placeArmies(int armyCount);
 
-	public abstract List<Command> attackTransfer();
+	public abstract Command attackTransfer();
 
 	/* Callbacks */
 	
