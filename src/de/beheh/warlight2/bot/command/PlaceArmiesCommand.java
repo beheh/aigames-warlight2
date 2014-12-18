@@ -19,7 +19,7 @@ public class PlaceArmiesCommand extends Command {
 	HashMap<Region, Integer> deployments = new HashMap<>();
 
 	public void placeArmy(Region region, int armyCount) {
-		if (deployments.containsKey(region.getId())) {
+		if (deployments.containsKey(region)) {
 			// add to existing deployment
 			deployments.put(region, armyCount + deployments.get(region));
 		} else {
