@@ -2,6 +2,7 @@ package de.beheh.warlight2;
 
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
+import de.beheh.warlight2.bot.command.NoMovesCommand;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
@@ -25,16 +26,20 @@ public class RequestProcessor {
 	}
 
 	protected String mergeCommands(List<Command> commands) {
-		Iterator<Command> iterator = commands.iterator();
 		StringBuilder builder = new StringBuilder();
-		boolean first = true;
-		while (iterator.hasNext()) {
-			if (!first) {
-				builder.append(", ");
-			} else {
-				first = false;
+		if (commands != null && commands.size() > 0) {
+			Iterator<Command> iterator = commands.iterator();
+			boolean first = true;
+			while (iterator.hasNext()) {
+				if (!first) {
+					builder.append(", ");
+				} else {
+					first = false;
+				}
+				builder.append(iterator.next().toString());
 			}
-			builder.append(iterator.next().toString());
+		} else {
+			builder.append(new NoMovesCommand().toString());
 		}
 		return builder.toString();
 	}
