@@ -28,7 +28,12 @@ public class MockRequestProcessor extends RequestProcessor {
 	}
 
 	@Override
-	public void onOpponentMoves() {
+	public void opponentMoves() {
+
+	}
+
+	@Override
+	public void mapReceived() {
 	}
 
 }

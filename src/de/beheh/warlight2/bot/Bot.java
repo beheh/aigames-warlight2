@@ -28,7 +28,9 @@ public abstract class Bot {
 
 	public abstract List<Command> attackTransfer();
 
-	public void onOpponentMoves() {
-
-	}
+	/* Callbacks */
+	
+	public void onMapReceived() {}
+	public void onOpponentMoves() {}
+	
 }

@@ -94,6 +94,8 @@ public class CommunicationHandler {
 						}
 						break;
 					case "pick_starting_region":
+						// we assume we received the map by now
+						requestProcessor.mapReceived();
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
 						requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2));
 						break;
@@ -137,7 +139,7 @@ public class CommunicationHandler {
 					case "opponent_moves":
 						CommunicationHandler.assertLength(parts, 1, 1);
 						//@todo opponent movement
-						requestProcessor.onOpponentMoves();
+						requestProcessor.opponentMoves();
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);

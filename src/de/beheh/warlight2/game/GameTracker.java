@@ -88,4 +88,14 @@ public class GameTracker {
 		}
 		return null;
 	}
+	
+	protected int round = 0;
+
+	public void nextRound() {
+		round++;
+	}
+	
+	public int getRound() {
+		return round;
+	}
 }

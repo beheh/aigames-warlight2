@@ -3,6 +3,7 @@ package de.beheh.warlight2.io;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
+import de.beheh.warlight2.game.map.Region;
 import java.util.Arrays;
 
 /**
@@ -10,26 +11,29 @@ import java.util.Arrays;
  * @author Benedict Etzel <developer@beheh.de>
  */
 public class MapHandler {
-
+	
 	protected GameTracker gameTracker;
-
+	
 	public MapHandler(GameTracker gameTracker) {
 		this.gameTracker = gameTracker;
 	}
-
+	
 	public void setSuperRegions(int[] parameters) {
+		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 2) {
-			gameTracker.getMap().addSuperRegion(parameters[i], parameters[i + 1]);
+			map.addSuperRegion(parameters[i], parameters[i + 1]);
 		}
 	}
-
+	
 	public void setRegions(int[] parameters) {
+		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 2) {
-			gameTracker.getMap().addRegion(parameters[i], parameters[i + 1]);
+			map.addRegion(parameters[i], parameters[i + 1]);
 		}
 	}
-
+	
 	public void setNeighbors(String[] parameters) {
+		Map map = gameTracker.getMap();
 		for (String rawRegion : parameters) {
 			String[] group = rawRegion.split(",");
 			int region = Integer.valueOf(group[0]);
@@ -38,24 +42,26 @@ public class MapHandler {
 				for (int i = 0; i < group.length - 1; i++) {
 					neighbors[i] = Integer.valueOf(group[i + 1]);
 				}
-				gameTracker.getMap().addNeighbors(region, neighbors);
+				map.addNeighbors(region, neighbors);
 			}
 		}
 	}
-
+	
 	public void setWastelands(int[] wastelands) {
+		Map map = gameTracker.getMap();
 		for (int wasteland : wastelands) {
-			gameTracker.getMap().setRegionAsWasteland(wasteland);
+			map.setRegionAsWasteland(wasteland);
 		}
 	}
-
+	
 	public void updateMap(String[] parameters) {
+		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 3) {
 			int region = Integer.valueOf(parameters[i]);
 			Player owner = gameTracker.getPlayer(parameters[i + 1]);
 			int armies = Integer.valueOf(parameters[i + 2]);
-			gameTracker.getMap().update(region, owner, armies);
+			map.update(region, owner, armies, gameTracker.getRound());
 		}
 	}
-
+	
 }

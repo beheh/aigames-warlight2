@@ -50,6 +50,7 @@ public class RequestProcessor {
 	}
 
 	public String placeArmies(Long time) {
+		gameTracker.nextRound();
 		return this.mergeCommands(bot.placeArmies());
 	}
 
@@ -57,8 +58,12 @@ public class RequestProcessor {
 		return this.mergeCommands(bot.attackTransfer());
 	}
 
-	public void onOpponentMoves() {
+	public void opponentMoves() {
 		bot.onOpponentMoves();
+	}
+
+	public void mapReceived() {
+		bot.onMapReceived();
 	}
 
 }

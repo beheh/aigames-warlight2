@@ -77,4 +77,15 @@ public class Region extends AbstractRegion {
 		}
 		return -1;
 	}
+
+	protected int lastUpdate;
+
+	public void setLastUpdate(int lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
+	public int getLastUpdate() {
+		return lastUpdate;
+	}
+
 }

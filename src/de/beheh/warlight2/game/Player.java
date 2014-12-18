@@ -19,4 +19,26 @@ public class Player {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (!object.getClass().equals(this.getClass())) {
+			return false;
+		}
+		Player player = (Player) object;
+		return player.getName().equals(getName());
+	}
+
+	@Override
+	public int hashCode() {
+		return getName().hashCode();
+	}
 }
