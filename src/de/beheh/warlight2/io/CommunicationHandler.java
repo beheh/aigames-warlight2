@@ -1,6 +1,5 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.RequestProcessor;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.bot.command.Command;
 import java.io.IOException;
@@ -64,6 +63,8 @@ public class CommunicationHandler {
 				continue;
 			}
 
+			boolean mapReceived = false;
+
 			List<Command> commands = null;
 			String[] parts = line.split(" ");
 			int[] list = null;
@@ -95,9 +96,12 @@ public class CommunicationHandler {
 						break;
 					case "pick_starting_region":
 						// we assume we received the map by now
-						requestProcessor.mapReceived();
+						if(!mapReceived) {
+							requestProcessor.mapReceived();
+							mapReceived = true;
+						}
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
-						requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2));
+						writer.println(requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2)));
 						break;
 					case "settings":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -146,14 +150,14 @@ public class CommunicationHandler {
 						switch (parts[1]) {
 							case "place_armies":
 								CommunicationHandler.assertLength(parts, 3);
-								writer.println(gameTracker.getPlayer().getName() + " " + parts[1] + " " + requestProcessor.placeArmies(Long.valueOf(parts[2])));
+								writer.println(requestProcessor.placeArmies(Long.valueOf(parts[2])));
 								break;
 							case "attack/transfer":
 								CommunicationHandler.assertLength(parts, 3);
-								writer.println(gameTracker.getPlayer().getName() + " " + parts[1] + " " + requestProcessor.attackTransfer(Long.valueOf(parts[2])));
+								writer.println(requestProcessor.attackTransfer(Long.valueOf(parts[2])));
 								break;
 							default:
-								writer.println();
+								writer.println("unknown command");
 								CommunicationHandler.unknownCommand(parts[1]);
 								break;
 						}
@@ -169,6 +173,7 @@ public class CommunicationHandler {
 				e.printStackTrace(System.err);
 				System.err.println("line for previous exception was \"" + line + "\"");
 			}
+			writer.flush();
 		}
 	}
 }
