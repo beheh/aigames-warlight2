@@ -1,4 +1,4 @@
-package de.beheh.warlight2;
+package de.beheh.warlight2.io;
 
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
