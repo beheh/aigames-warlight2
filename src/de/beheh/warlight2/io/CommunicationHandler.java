@@ -57,13 +57,13 @@ public class CommunicationHandler {
 	}
 
 	public void run() throws IOException {
+		boolean mapReceived = false;
+
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.length() == 0) {
 				continue;
 			}
-
-			boolean mapReceived = false;
 
 			List<Command> commands = null;
 			String[] parts = line.split(" ");
@@ -96,7 +96,7 @@ public class CommunicationHandler {
 						break;
 					case "pick_starting_region":
 						// we assume we received the map by now
-						if(!mapReceived) {
+						if (!mapReceived) {
 							requestProcessor.mapReceived();
 							mapReceived = true;
 						}
