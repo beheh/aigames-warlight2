@@ -1,11 +1,11 @@
 package de.beheh.warlight2;
 
+import de.beheh.warlight2.io.RequestProcessor;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.impl.Quickstep;
 import de.beheh.warlight2.io.CommunicationHandler;
 import de.beheh.warlight2.io.MapHandler;
-import de.beheh.warlight2.game.map.Map;
 
 /**
  *

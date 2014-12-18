@@ -1,6 +1,6 @@
 package de.beheh.warlight2.mock;
 
-import de.beheh.warlight2.RequestProcessor;
+import de.beheh.warlight2.io.RequestProcessor;
 
 /**
  *
