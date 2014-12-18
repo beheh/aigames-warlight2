@@ -97,7 +97,7 @@ public class CommunicationHandler {
 					case "pick_starting_region":
 						// we assume we received the map by now
 						if (!mapReceived) {
-							requestProcessor.mapReceived();
+							requestProcessor.mapComplete();
 							mapReceived = true;
 						}
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
@@ -149,6 +149,11 @@ public class CommunicationHandler {
 						CommunicationHandler.assertLength(parts, 2, 1);
 						switch (parts[1]) {
 							case "place_armies":
+								// we assume new round
+								gameTracker.nextRound();
+								if (gameTracker.getRound() == 1) {
+									requestProcessor.pickingComplete();
+								}
 								CommunicationHandler.assertLength(parts, 3);
 								writer.println(requestProcessor.placeArmies(Long.valueOf(parts[2])));
 								break;

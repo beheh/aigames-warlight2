@@ -44,7 +44,6 @@ public class RequestProcessor {
 	}
 
 	public String placeArmies(Long time) {
-		gameTracker.nextRound();
 		return commandToString(bot.placeArmies(gameTracker.getStartingArmies()));
 	}
 
@@ -56,8 +55,12 @@ public class RequestProcessor {
 		bot.onOpponentMoves();
 	}
 
-	public void mapReceived() {
-		bot.onMapReceived();
+	public void mapComplete() {
+		bot.onMapComplete();
+	}
+	
+	public void pickingComplete() {
+		bot.onPickingComplete();
 	}
 
 }

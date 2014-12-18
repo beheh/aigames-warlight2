@@ -20,13 +20,19 @@ import java.util.Random;
  * @author Benedict Etzel <developer@beheh.de>
  */
 public class Quickstep extends Bot {
-	
+
 	public Quickstep(GameTracker gameTracker) {
 		super(gameTracker);
 	}
-	
+
+	List<Region> startingRegions = null;
+
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
+		// save all starting regions for later
+		if (startingRegions == null) {
+			startingRegions = new ArrayList<>(Arrays.asList(regions));
+		}
 		Region pickRegion = null;
 		Map map = gameTracker.getMap();
 		// pick highest ranked region
@@ -46,7 +52,21 @@ public class Quickstep extends Bot {
 		}
 		return pickRegion;
 	}
-	
+
+	@Override
+	public void onPickingComplete() {
+		// regions we didn't pick went our opponent
+		Iterator<Region> iterator = startingRegions.iterator();
+		while (iterator.hasNext()) {
+			Region startingRegion = iterator.next();
+			if (startingRegion.getOwner() == null || !startingRegion.getOwner().equals(gameTracker.getPlayer())) {
+				System.err.println("region " + startingRegion + " wasn't picked by us, current owner is " + startingRegion.getOwner());
+				startingRegion.setOwner(gameTracker.getOpponent());
+				startingRegion.setLastUpdate(0); // updated at "round 0"
+			}
+		}
+	}
+
 	@Override
 	public Command placeArmies(int armyCount) {
 		Map map = gameTracker.getMap();
@@ -59,22 +79,22 @@ public class Quickstep extends Bot {
 		}
 		return command;
 	}
-	
+
 	@Override
 	public Command attackTransfer() {
 		Map map = gameTracker.getMap();
 		return null;
 	}
-	
+
 	@Override
-	public void onMapReceived() {
+	public void onMapComplete() {
 		Map map = gameTracker.getMap();
 		System.err.println(map.toString());
 		rankRegions();
 	}
-	
+
 	List<RegionRank> prioritizedRegions = null;
-	
+
 	protected void rankRegions() {
 		prioritizedRegions = new ArrayList<RegionRank>();
 		Map map = gameTracker.getMap();
@@ -94,7 +114,7 @@ public class Quickstep extends Bot {
 		while (iterator.hasNext()) {
 			RegionRank regionRank = iterator.next();
 		}
-		
+
 		Collections.sort(prioritizedRegions, new Comparator<RegionRank>() {
 			@Override
 			public int compare(RegionRank rr1, RegionRank rr2) {
@@ -102,25 +122,25 @@ public class Quickstep extends Bot {
 			}
 		});
 	}
-	
+
 	protected class RegionRank {
-		
+
 		protected float rank;
 		protected Region region;
-		
+
 		public RegionRank(float rank, Region region) {
 			this.rank = rank;
 			this.region = region;
 		}
-		
+
 		public float getRank() {
 			return rank;
 		}
-		
+
 		public Region getRegion() {
 			return region;
 		}
-		
+
 		@Override
 		public String toString() {
 			return rank + ": " + region.toString();

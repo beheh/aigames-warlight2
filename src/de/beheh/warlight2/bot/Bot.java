@@ -4,7 +4,6 @@ import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.game.map.Region;
-import java.util.List;
 
 /**
  *
@@ -30,7 +29,7 @@ public abstract class Bot {
 
 	/* Callbacks */
 	
-	public void onMapReceived() {}
+	public void onMapComplete() {}
 	public void onOpponentMoves() {}
-	
+	public void onPickingComplete() {}
 }

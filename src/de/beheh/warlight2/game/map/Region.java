@@ -94,13 +94,13 @@ public class Region extends AbstractRegion {
 		return shortestDistance;
 	}
 
-	protected int lastUpdate;
+	protected Integer lastUpdate = null;
 
 	public void setLastUpdate(int lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
-	public int getLastUpdate() {
+	public Integer getLastUpdate() {
 		return lastUpdate;
 	}
 
