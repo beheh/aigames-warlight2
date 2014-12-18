@@ -1,5 +1,6 @@
 package de.beheh.warlight2.io;
 
+import de.beheh.warlight2.map.Map;
 import de.beheh.warlight2.mock.MockBot;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class CommunicationHandlerTest {
 				+ "setup_map wastelands 3\n"
 				+ "pick_starting_region 10000 2 4\n").getBytes();
 		InputStream stream = new ByteArrayInputStream(input);
-		CommunicationHandler instance = new CommunicationHandler(stream, System.out, bot);
+		CommunicationHandler instance = new CommunicationHandler(stream, System.out, new MapHandler(new Map()), bot);
 		instance.run();
 		assertEquals(10000, bot.getTimebank());
 		assertEquals(500, bot.getTimePerMove());

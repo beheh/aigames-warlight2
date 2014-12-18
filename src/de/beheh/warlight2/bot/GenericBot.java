@@ -1,5 +1,7 @@
 package de.beheh.warlight2.bot;
 
+import de.beheh.warlight2.map.Map;
+
 /**
  *
  * @author Benedict Etzel <developer@beheh.de>
@@ -11,7 +13,15 @@ public abstract class GenericBot implements Bot {
 		return false;
 	}
 
+	protected Map map;
+
+	@Override
+	public void setMap(Map map) {
+		this.map = map;
+	}
+
 	/* Settings */
+	
 	private long timebank;
 
 	@Override

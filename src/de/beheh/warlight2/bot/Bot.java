@@ -1,7 +1,7 @@
 package de.beheh.warlight2.bot;
 
 import de.beheh.warlight2.bot.command.Command;
-import de.beheh.warlight2.bot.map.Region;
+import de.beheh.warlight2.map.Map;
 import java.util.List;
 
 /**
@@ -13,6 +13,8 @@ public interface Bot {
 	/* Internal */
 	
 	public boolean shouldFailHard();
+	
+	public void setMap(Map map);
 	
 	/* Settings */
 

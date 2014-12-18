@@ -26,6 +26,7 @@ public class MockBot extends GenericBot {
 	
 	@Override
 	public int onPickStartingRegion(long time, int[] regions) {
+		System.out.println("onPickStartingRegion: " + Arrays.toString(regions));
 		return 0;
 	}
 	

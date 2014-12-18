@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,21 +16,23 @@ import java.util.Scanner;
  * @author Benedict Etzel <developer@beheh.de>
  */
 public class CommunicationHandler {
-
+	
 	private final Scanner scanner;
 	private final PrintWriter writer;
+	private final MapHandler mapHandler;
 	private final Bot bot;
-
-	public CommunicationHandler(InputStream input, OutputStream output, Bot bot) {
+	
+	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, Bot bot) {
 		this.scanner = new Scanner(input);
 		this.writer = new PrintWriter(output);
+		this.mapHandler = mapHandler;
 		this.bot = bot;
 	}
-
+	
 	protected static void assertLength(String[] parts, int length) throws IOException {
 		CommunicationHandler.assertLength(parts, length, 0);
 	}
-
+	
 	protected static void assertLength(String[] parts, int length, int increments) throws IOException {
 		if (parts.length < length || (increments != 0 && (parts.length - length) % increments != 0)) {
 			String multiples = "";
@@ -39,20 +42,29 @@ public class CommunicationHandler {
 			throw new IOException("invalid parameter count (expected " + length + multiples + ", got " + parts.length + ")");
 		}
 	}
-
+	
 	protected static void unknownCommand(String command) throws IOException {
 		throw new IOException("unknown command \"" + command + "\"");
 	}
-
+	
+	protected static int[] castIntegerParameters(String[] array, int from) {
+		int[] list = new int[array.length - from];
+		for (int i = from; i < array.length; i++) {
+			list[i - from] = Integer.valueOf(array[i]);
+		}
+		return list;
+	}
+	
 	public void run() throws IOException {
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.length() == 0) {
 				continue;
 			}
-
+			
 			List<Command> commands = null;
 			String[] parts = line.split(" ");
+			int[] list = null;
 			try {
 				switch (parts[0]) {
 					case "setup_map":
@@ -60,15 +72,19 @@ public class CommunicationHandler {
 						switch (parts[1]) {
 							case "super_regions":
 								CommunicationHandler.assertLength(parts, 2, 1);
+								mapHandler.setSuperRegions(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							case "regions":
 								CommunicationHandler.assertLength(parts, 2, 1);
+								mapHandler.setRegions(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							case "neighbors":
-
+								CommunicationHandler.assertLength(parts, 2, 1);
+								mapHandler.setNeighbors(Arrays.copyOfRange(parts, 2, parts.length));
 								break;
 							case "wastelands":
 								CommunicationHandler.assertLength(parts, 2, 1);
+								mapHandler.setWastelands(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
@@ -77,11 +93,7 @@ public class CommunicationHandler {
 						break;
 					case "pick_starting_region":
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
-						int[] regions = new int[parts.length - 2];
-						for (int i = 2; i < parts.length; i++) {
-							regions[i - 2] = Integer.valueOf(parts[i]);
-						}
-						bot.onPickStartingRegion(Long.valueOf(parts[1]), regions);
+						bot.onPickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2));
 						break;
 					case "settings":
 						CommunicationHandler.assertLength(parts, 2, 1);
