@@ -30,7 +30,7 @@ public class PlaceArmiesCommand extends Command {
 
 	@Override
 	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder(gameTracker.getPlayer().getName() + " place_armies ");
+		StringBuilder stringBuilder = new StringBuilder();
 		Iterator<Entry<Region, Integer>> iterator = deployments.entrySet().iterator();
 		boolean first = true;
 		while (iterator.hasNext()) {
@@ -39,8 +39,9 @@ public class PlaceArmiesCommand extends Command {
 			} else {
 				first = false;
 			}
+			stringBuilder.append(gameTracker.getPlayer().getName()).append(" place_armies ");
 			Entry<Region, Integer> entry = iterator.next();
-			stringBuilder.append(entry.getKey().getId() + " " + entry.getValue());
+			stringBuilder.append(entry.getKey().getId()).append(" ").append(entry.getValue());
 		}
 		return stringBuilder.toString();
 	}
