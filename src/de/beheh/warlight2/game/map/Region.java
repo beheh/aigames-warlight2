@@ -2,6 +2,7 @@ package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -71,11 +72,26 @@ public class Region extends AbstractRegion {
 		return owner;
 	}
 
+	protected boolean isSearching = false;
+
 	public int distanceTo(Region region) {
 		if (region.equals(this)) {
 			return 0;
 		}
-		return -1;
+		if (isSearching) {
+			return -1;
+		}
+		Iterator<Region> iterator = neighbors.iterator();
+		int shortestDistance = -1;
+		isSearching = true;
+		while (iterator.hasNext()) {
+			int distance = iterator.next().distanceTo(region);
+			if (distance != -1 && (shortestDistance == -1 || distance < shortestDistance)) {
+				shortestDistance = distance + 1;
+			}
+		}
+		isSearching = false;
+		return shortestDistance;
 	}
 
 	protected int lastUpdate;

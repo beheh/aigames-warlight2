@@ -2,6 +2,7 @@ package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,7 @@ public class Map {
 			Region linked = regions.get(neighbor);
 			region.addNeighbor(linked);
 			linked.addNeighbor(region);
+			System.out.println(region + " <-> " + linked);
 		}
 	}
 
@@ -58,16 +60,49 @@ public class Map {
 		return superRegions.get(id);
 	}
 
+	public List<SuperRegion> getSuperRegions() {
+		return new ArrayList<>(superRegions.values());
+	}
+
 	public List<Region> getRegionsByPlayer(Player player) {
 		List<Region> playerRegions = new ArrayList<>();
-		Iterator<Entry<Integer, Region>> iterator = regions.entrySet().iterator();
+		Iterator<Region> iterator = regions.values().iterator();
 		while (iterator.hasNext()) {
-			Entry<Integer, Region> entry = iterator.next();
-			Region region = iterator.next().getValue();
+			Region region = iterator.next();
 			if (region.getOwner().equals(player)) {
 				playerRegions.add(region);
 			}
 		}
 		return playerRegions;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("Map(SuperRegions(");
+		Iterator<Region> regionIterator = regions.values().iterator();
+		boolean first = true;
+		while (regionIterator.hasNext()) {
+			if (!first) {
+				builder.append(", ");
+			} else {
+				first = false;
+			}
+			Region region = regionIterator.next();
+			builder.append(region.toString());
+		}
+		builder.append("), Regions(");
+		Iterator<SuperRegion> superRegionItrator = superRegions.values().iterator();
+		first = true;
+		while (superRegionItrator.hasNext()) {
+			if (!first) {
+				builder.append(", ");
+			} else {
+				first = false;
+			}
+			SuperRegion superRegion = superRegionItrator.next();
+			builder.append(superRegion.toString());
+		}
+		builder.append(")");
+		return builder.toString();
 	}
 }
