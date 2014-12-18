@@ -79,6 +79,15 @@ public class CommunicationHandlerTest {
 		assertEquals(50, gameTracker.getMaxRounds());
 		assertEquals("player1", gameTracker.getPlayer().getName());
 		assertEquals("player2", gameTracker.getOpponent().getName());
+		Map map = gameTracker.getMap();
+		assertEquals(0, map.getRegion(1).distanceTo(map.getRegion(1)));
+		assertEquals(1, map.getRegion(1).distanceTo(map.getRegion(2)));
+		assertEquals(1, map.getRegion(2).distanceTo(map.getRegion(1)));
+		assertEquals(1, map.getRegion(1).distanceTo(map.getRegion(3)));
+		assertEquals(1, map.getRegion(2).distanceTo(map.getRegion(3)));
+		assertEquals(1, map.getRegion(4).distanceTo(map.getRegion(5)));
+		assertEquals(2, map.getRegion(1).distanceTo(map.getRegion(5)));
+		assertEquals(2, map.getRegion(5).distanceTo(map.getRegion(1)));
 	}
 	
 }
