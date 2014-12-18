@@ -63,14 +63,14 @@ public class SuperRegion extends AbstractRegion {
 	}
 
 	public List<Region> missingRegions(Player player) {
-		List<Region> regions = new ArrayList<>();
+		List<Region> missingRegions = new ArrayList<>();
 		Iterator<Region> iterator = regions.iterator();
 		while (iterator.hasNext()) {
 			Region region = iterator.next();
-			if (!region.getOwner().equals(player)) {
-				regions.add(region);
+			if (!player.equals(region.getOwner())) {
+				missingRegions.add(region);
 			}
 		}
-		return regions;
+		return missingRegions;
 	}
 }
