@@ -37,7 +37,6 @@ public class Map {
 			Region linked = regions.get(neighbor);
 			region.addNeighbor(linked);
 			linked.addNeighbor(region);
-			System.out.println(region + " <-> " + linked);
 		}
 	}
 
