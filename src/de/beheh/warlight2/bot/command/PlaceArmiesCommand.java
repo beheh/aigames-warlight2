@@ -30,7 +30,7 @@ public class PlaceArmiesCommand extends Command {
 
 	@Override
 	public String toString() {
-		StringBuilder stringBuilder = new StringBuilder(gameTracker.getPlayer().getName() + " place_armies");
+		StringBuilder stringBuilder = new StringBuilder(gameTracker.getPlayer().getName() + " place_armies ");
 		Iterator<Entry<Region, Integer>> iterator = deployments.entrySet().iterator();
 		boolean first = true;
 		while (iterator.hasNext()) {
