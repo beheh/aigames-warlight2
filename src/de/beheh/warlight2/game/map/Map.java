@@ -68,7 +68,7 @@ public class Map {
 		Iterator<Region> iterator = regions.values().iterator();
 		while (iterator.hasNext()) {
 			Region region = iterator.next();
-			if (region.getOwner().equals(player)) {
+			if (region.getOwner() != null && region.getOwner().equals(player)) {
 				playerRegions.add(region);
 			}
 		}
