@@ -77,7 +77,7 @@ public class Map {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("Map(SuperRegions(");
+		StringBuilder builder = new StringBuilder("Map(Regions(");
 		Iterator<Region> regionIterator = regions.values().iterator();
 		boolean first = true;
 		while (regionIterator.hasNext()) {
@@ -89,7 +89,7 @@ public class Map {
 			Region region = regionIterator.next();
 			builder.append(region.toString());
 		}
-		builder.append("), Regions(");
+		builder.append("), SuperRegions(");
 		Iterator<SuperRegion> superRegionItrator = superRegions.values().iterator();
 		first = true;
 		while (superRegionItrator.hasNext()) {
