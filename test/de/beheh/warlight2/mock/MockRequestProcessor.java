@@ -33,7 +33,11 @@ public class MockRequestProcessor extends RequestProcessor {
 	}
 
 	@Override
-	public void mapReceived() {
+	public void mapComplete() {
+	}
+
+	@Override
+	public void pickingComplete() {
 	}
 
 }
