@@ -94,6 +94,26 @@ public class Region extends AbstractRegion {
 		return shortestDistance;
 	}
 
+	public int playerDistance(Player player) {
+		if (owner != null && owner.equals(player)) {
+			return 0;
+		}
+		if (isSearching) {
+			return -1;
+		}
+		Iterator<Region> iterator = neighbors.iterator();
+		int shortestDistance = -1;
+		isSearching = true;
+		while (iterator.hasNext()) {
+			int distance = iterator.next().playerDistance(player);
+			if (distance != -1 && (shortestDistance == -1 || distance < shortestDistance)) {
+				shortestDistance = distance + 1;
+			}
+		}
+		isSearching = false;
+		return shortestDistance;
+	}
+
 	protected Integer lastUpdate = null;
 
 	public void setLastUpdate(int lastUpdate) {
