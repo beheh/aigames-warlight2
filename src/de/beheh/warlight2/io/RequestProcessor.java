@@ -6,8 +6,6 @@ import de.beheh.warlight2.bot.command.NoMovesCommand;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Processes requests from the CommunicationHandler and returns the answer from
@@ -61,6 +59,10 @@ public class RequestProcessor {
 	
 	public void pickingComplete() {
 		bot.onPickingComplete();
+	}
+
+	public void roundComplete() {
+		bot.onRoundComplete();
 	}
 
 }

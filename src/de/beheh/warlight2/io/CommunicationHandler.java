@@ -99,6 +99,8 @@ public class CommunicationHandler {
 						if (!mapReceived) {
 							requestProcessor.mapComplete();
 							mapReceived = true;
+						} else {
+							requestProcessor.roundComplete();
 						}
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
 						writer.println(requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2)));
@@ -142,7 +144,8 @@ public class CommunicationHandler {
 						break;
 					case "opponent_moves":
 						CommunicationHandler.assertLength(parts, 1, 1);
-						//@todo opponent movement
+						// map changes are already handled by update_map
+						// this is mainly for analyzing the enemies behaviour
 						requestProcessor.opponentMoves();
 						break;
 					case "go":

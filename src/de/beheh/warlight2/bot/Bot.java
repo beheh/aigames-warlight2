@@ -32,4 +32,5 @@ public abstract class Bot {
 	public void onMapComplete() {}
 	public void onOpponentMoves() {}
 	public void onPickingComplete() {}
+	public void onRoundComplete() {}
 }
