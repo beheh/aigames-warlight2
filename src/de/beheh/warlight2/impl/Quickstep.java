@@ -1,10 +1,9 @@
 package de.beheh.warlight2.impl;
 
-import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.AttackTransferCommand;
-import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
+import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
@@ -14,7 +13,6 @@ import de.beheh.warlight2.stats.ReinforcementRank;
 import de.beheh.warlight2.stats.SuperRegionRank;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -57,7 +55,7 @@ public class Quickstep extends Bot {
 		// pick highest ranked region
 		for (SuperRegion superRegion : superRegionRanking.getRankList()) {
 			for (Region region : regions) {
-				if (region.getSuperRegion().equals(region)) {
+				if (region.getSuperRegion().equals(superRegion)) {
 					pickRegion = region;
 				}
 				break;
@@ -221,7 +219,7 @@ public class Quickstep extends Bot {
 			e.printStackTrace(System.err);
 			return command;
 		}
-		
+
 		for (Region region : map.getRegions()) {
 			region.commitSchedule();
 		}
