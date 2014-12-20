@@ -60,7 +60,7 @@ public class Region extends AbstractRegion {
 	}
 
 	protected int schedule = 0;
-	
+
 	public void scheduleIncreaseArmy(int by) {
 		schedule += by;
 	}
@@ -112,7 +112,9 @@ public class Region extends AbstractRegion {
 			}
 		}
 		isSearching = false;
-		distances.put(region, shortestDistance);
+		if (shortestDistance != -1) {
+			distances.put(region, shortestDistance);
+		}
 		return shortestDistance;
 	}
 
