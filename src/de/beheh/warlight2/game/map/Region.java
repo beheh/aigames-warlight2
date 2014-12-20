@@ -59,11 +59,18 @@ public class Region extends AbstractRegion {
 		this.armycount = armies;
 	}
 
-	public void increaseArmyCount(int by) {
-		armycount += by;
+	protected int schedule = 0;
+	
+	public void scheduleIncreaseArmy(int by) {
+		schedule += by;
 	}
 
-	public void decreaseArmyCount(int by) {
+	public void commitSchedule() {
+		armycount += schedule;
+		schedule = 0;
+	}
+
+	public void decreaseArmy(int by) {
 		armycount -= by;
 	}
 
@@ -148,8 +155,8 @@ public class Region extends AbstractRegion {
 
 	public int getPotentialAttackers() {
 		int potentialAttackers = 0;
-		for(Region neighbor : neighbors) {
-			if(neighbor.getOwner() != null && (owner == null || !owner.equals(neighbor.getOwner()))) {
+		for (Region neighbor : neighbors) {
+			if (neighbor.getOwner() != null && (owner == null || !owner.equals(neighbor.getOwner()))) {
 				potentialAttackers += neighbor.getArmyCount() - 1;
 			}
 		}

@@ -9,6 +9,7 @@ import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
 import de.beheh.warlight2.stats.Ranking;
+import de.beheh.warlight2.stats.RegionRank;
 import de.beheh.warlight2.stats.ReinforcementRank;
 import de.beheh.warlight2.stats.SuperRegionRank;
 import java.util.ArrayList;
@@ -107,17 +108,18 @@ public class Quickstep extends Bot {
 		List<Region> rankList = regionRanking.getRankList();
 		if (rankList.size() > 0) {
 			Region target = rankList.get(0);
-			command.placeArmy(target, remaining / 3);
-			target.increaseArmyCount(remaining / 3);
-			remaining /= 3;
+			int placing = remaining / 3;
+			command.placeArmy(target, placing);
+			target.scheduleIncreaseArmy(placing);
+			remaining -= placing;
 		}
 
 		// pick a random region
 		Random rand = new Random();
 		for (; remaining > 0; remaining--) {
 			Region target = ownRegions.get(rand.nextInt(ownRegions.size()));
-			command.placeArmy(target, armyCount);
-			target.increaseArmyCount(armyCount);
+			command.placeArmy(target, 1);
+			target.scheduleIncreaseArmy(1);
 		}
 
 		return command;
@@ -146,8 +148,15 @@ public class Quickstep extends Bot {
 					freeArmies -= potentialAttackers;
 				}
 
-				// can we attack something with the rest?
+				// rank neighbors
+				Ranking<Region> neighborRanking = new Ranking<>();
 				for (Region neighbor : region.getNeighbors()) {
+					neighborRanking.addObject(neighbor, new RegionRank(region));
+				}
+				List<Region> neighborRankList = neighborRanking.getRankList();
+
+				// can we attack something with the rest?
+				for (Region neighbor : neighborRankList) {
 					if (gameTracker.getOpponent().equals(neighbor.getOwner())) {
 						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
 						// force attack if we really have enough
@@ -157,8 +166,8 @@ public class Quickstep extends Bot {
 						if (freeArmies >= requiredArmies && requiredArmies > 0) {
 							int armiesToSend = requiredArmies + (freeArmies - requiredArmies / 2) + 1;
 							command.attack(region, neighbor, armiesToSend);
-							region.decreaseArmyCount(armiesToSend);
-							neighbor.increaseArmyCount(armiesToSend);
+							region.decreaseArmy(armiesToSend);
+							neighbor.scheduleIncreaseArmy(armiesToSend);
 							freeArmies -= armiesToSend;
 						}
 					}
@@ -170,13 +179,13 @@ public class Quickstep extends Bot {
 				}
 
 				// anything neutral to capture?
-				for (Region neighbor : region.getNeighbors()) {
+				for (Region neighbor : neighborRankList) {
 					if (neighbor.getOwner() == null) {
 						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
 						if (freeArmies >= requiredArmies) {
 							command.attack(region, neighbor, requiredArmies);
-							region.decreaseArmyCount(requiredArmies);
-							neighbor.increaseArmyCount(requiredArmies);
+							region.decreaseArmy(requiredArmies);
+							neighbor.scheduleIncreaseArmy(requiredArmies);
 							freeArmies -= requiredArmies;
 						}
 					}
@@ -203,14 +212,18 @@ public class Quickstep extends Bot {
 				// move all but one
 				if (target != region) {
 					command.transfer(region, target, freeArmies);
-					region.decreaseArmyCount(freeArmies);
-					target.increaseArmyCount(freeArmies);
+					region.decreaseArmy(freeArmies);
+					target.scheduleIncreaseArmy(freeArmies);
 					freeArmies = 0;
 				}
 			}
 		} catch (RuntimeException e) {
 			e.printStackTrace(System.err);
 			return command;
+		}
+		
+		for (Region region : map.getRegions()) {
+			region.commitSchedule();
 		}
 
 		return command;

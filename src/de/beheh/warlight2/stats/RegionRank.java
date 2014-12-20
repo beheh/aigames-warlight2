@@ -10,13 +10,13 @@ public class RegionRank extends Rank {
 
 	protected Region region;
 
-	public RegionRank(Region superRegion) {
-		this.region = superRegion;
+	public RegionRank(Region region) {
+		this.region = region;
 	}
 
 	@Override
 	public double getScore() {
-		return 1;
+		return region.getSuperRegion().getBonus();
 	}
 
 }
