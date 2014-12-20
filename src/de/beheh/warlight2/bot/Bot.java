@@ -3,7 +3,6 @@ package de.beheh.warlight2.bot;
 import de.beheh.warlight2.bot.command.AttackTransferCommand;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.Player;
-import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
 import de.beheh.warlight2.game.map.Region;
 
@@ -34,5 +33,6 @@ public abstract class Bot {
 	public void onMapComplete() {}
 	public void onOpponentMoves() {}
 	public void onPickingComplete() {}
+	public void onRoundStart() {}
 	public void onRoundComplete() {}
 }

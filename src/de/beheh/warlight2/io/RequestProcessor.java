@@ -74,6 +74,7 @@ public class RequestProcessor {
 
 	public void roundComplete() {
 		bot.onRoundComplete();
+		bot.onRoundStart();
 	}
 
 }
