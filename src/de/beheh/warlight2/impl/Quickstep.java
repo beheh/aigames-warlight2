@@ -87,7 +87,7 @@ public class Quickstep extends Bot {
 	}
 
 	protected int getRequiredArmies(int armyCount) {
-		return Math.round(armyCount * 1.6f);
+		return Math.round(armyCount * 1.65f);
 	}
 
 	@Override
@@ -102,20 +102,24 @@ public class Quickstep extends Bot {
 			regionRanking.addObject(region, new ReinforcementRank(region));
 		}
 
+		int remaining = armyCount;
+
 		List<Region> rankList = regionRanking.getRankList();
 		if (rankList.size() > 0) {
 			Region target = rankList.get(0);
+			command.placeArmy(target, remaining / 3);
+			target.increaseArmyCount(remaining / 3);
+			remaining /= 3;
+		}
+
+		// pick a random region
+		Random rand = new Random();
+		for (; remaining > 0; remaining--) {
+			Region target = ownRegions.get(rand.nextInt(ownRegions.size()));
 			command.placeArmy(target, armyCount);
 			target.increaseArmyCount(armyCount);
-		} else {
-			// pick a random region
-			Random rand = new Random();
-			for (int remaining = armyCount; armyCount > 0; armyCount--) {
-				Region target = ownRegions.get(rand.nextInt(ownRegions.size()));
-				command.placeArmy(target, armyCount);
-				target.increaseArmyCount(armyCount);
-			}
 		}
+
 		return command;
 	}
 
@@ -146,11 +150,16 @@ public class Quickstep extends Bot {
 				for (Region neighbor : region.getNeighbors()) {
 					if (gameTracker.getOpponent().equals(neighbor.getOwner())) {
 						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
-						if (freeArmies >= requiredArmies) {
-							command.attack(region, neighbor, requiredArmies);
-							region.decreaseArmyCount(requiredArmies);
-							neighbor.increaseArmyCount(requiredArmies);
-							freeArmies -= requiredArmies;
+						// force attack if we really have enough
+						if (neighbor.getPotentialAttackers() > 3 * freeArmies) {
+							requiredArmies = freeArmies;
+						}
+						if (freeArmies >= requiredArmies && requiredArmies > 0) {
+							int armiesToSend = requiredArmies + (freeArmies - requiredArmies / 2) + 1;
+							command.attack(region, neighbor, armiesToSend);
+							region.decreaseArmyCount(armiesToSend);
+							neighbor.increaseArmyCount(armiesToSend);
+							freeArmies -= armiesToSend;
 						}
 					}
 				}
