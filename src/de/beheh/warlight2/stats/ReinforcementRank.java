@@ -16,7 +16,7 @@ public class ReinforcementRank extends Rank {
 
 	@Override
 	public double getScore() {
-		return region.getPotentialAttackers() - region.getArmyCount();
+		return Math.max(region.getPotentialAttackers() - region.getArmyCount(), 0);
 	}
 
 }

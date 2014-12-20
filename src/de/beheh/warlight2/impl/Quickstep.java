@@ -180,7 +180,7 @@ public class Quickstep extends Bot {
 
 				// nothing worth attacking or defending for some armies, so move to best region
 				Region target = region;
-				int targetEnemyDistance = -1;
+				int targetEnemyDistance = region.playerDistance(gameTracker.getOpponent(), 4);
 				for (Region neighbor : region.getNeighbors()) {
 					if (region.getOwner() == neighbor.getOwner()) {
 						// awesome! lets go there
