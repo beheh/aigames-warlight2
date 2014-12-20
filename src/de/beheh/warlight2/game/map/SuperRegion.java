@@ -50,19 +50,29 @@ public class SuperRegion extends AbstractRegion {
 		return true;
 	}
 
-	public List<Region> ownedRegions(Player player) {
-		List<Region> regions = new ArrayList<>();
-		Iterator<Region> iterator = regions.iterator();
+	public int getOwnedRegionCount(Player player) {
+		// @todo optimize with direct counting
+		return getOwnedRegions(player).size();
+	}
+
+	public List<Region> getOwnedRegions(Player player) {
+		List<Region> ownedRegions = new ArrayList<>();
+		Iterator<Region> iterator = ownedRegions.iterator();
 		while (iterator.hasNext()) {
 			Region region = iterator.next();
 			if (region.getOwner().equals(player)) {
-				regions.add(region);
+				ownedRegions.add(region);
 			}
 		}
-		return regions;
+		return ownedRegions;
 	}
 
-	public List<Region> missingRegions(Player player) {
+	public int getMissingRegionCount(Player player) {
+		// @todo optimize with direct counting
+		return getMissingRegions(player).size();
+	}
+
+	public List<Region> getMissingRegions(Player player) {
 		List<Region> missingRegions = new ArrayList<>();
 		Iterator<Region> iterator = regions.iterator();
 		while (iterator.hasNext()) {
