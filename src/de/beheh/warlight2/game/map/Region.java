@@ -150,7 +150,7 @@ public class Region extends AbstractRegion {
 		int potentialAttackers = 0;
 		for(Region neighbor : neighbors) {
 			if(neighbor.getOwner() != null && (owner == null || !owner.equals(neighbor.getOwner()))) {
-				potentialAttackers += neighbor.getArmyCount();
+				potentialAttackers += neighbor.getArmyCount() - 1;
 			}
 		}
 		return potentialAttackers;
