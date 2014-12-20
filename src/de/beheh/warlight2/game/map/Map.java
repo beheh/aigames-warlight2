@@ -3,6 +3,7 @@ package de.beheh.warlight2.game.map;
 import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -127,5 +128,9 @@ public class Map {
 		}
 		builder.append(")");
 		return builder.toString();
+	}
+
+	public Collection<Region> getRegions() {
+		return regions.values();
 	}
 }
