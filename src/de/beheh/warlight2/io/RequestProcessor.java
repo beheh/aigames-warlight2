@@ -24,7 +24,7 @@ public class RequestProcessor {
 	}
 
 	protected String commandToString(Command command) {
-		if (command != null) {
+		if (command != null && command.toString() != null) {
 			return command.toString();
 		} else {
 			return new NoMovesCommand().toString();
@@ -32,21 +32,32 @@ public class RequestProcessor {
 	}
 
 	public String pickStartingRegion(Long time, int[] regionIds) {
+		Long start = System.currentTimeMillis();
+		gameTracker.setTime(time);
 		Map map = gameTracker.getMap();
 		Region[] regions = new Region[regionIds.length];
 		for (int i = 0; i < regionIds.length; i++) {
 			regions[i] = map.getRegion(regionIds[i]);
 		}
 		Region region = bot.pickStartingRegion(regions);
+		System.err.println("pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
 		return region.toString();
 	}
 
 	public String placeArmies(Long time) {
-		return commandToString(bot.placeArmies(gameTracker.getStartingArmies()));
+		Long start = System.currentTimeMillis();
+		gameTracker.setTime(time);
+		Command command = bot.placeArmies(gameTracker.getStartingArmies());
+		System.err.println("Round #" + gameTracker.getRound() + ": placeArmies took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		return commandToString(command);
 	}
 
 	public String attackTransfer(Long time) {
-		return commandToString(bot.attackTransfer());
+		Long start = System.currentTimeMillis();
+		gameTracker.setTime(time);
+		Command command = bot.attackTransfer();
+		System.err.println("Round #" + gameTracker.getRound() + ": attackTransfer took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		return commandToString(command);
 	}
 
 	public void opponentMoves() {
@@ -56,7 +67,7 @@ public class RequestProcessor {
 	public void mapComplete() {
 		bot.onMapComplete();
 	}
-	
+
 	public void pickingComplete() {
 		bot.onPickingComplete();
 	}

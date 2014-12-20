@@ -31,6 +31,8 @@ public class Map {
 		return region;
 	}
 
+	List<Integer> neighborCounts = new ArrayList<>();
+
 	public void addNeighbors(int id, int[] neighbors) {
 		Region region = regions.get(id);
 		for (int neighbor : neighbors) {
@@ -38,6 +40,24 @@ public class Map {
 			region.addNeighbor(linked);
 			linked.addNeighbor(region);
 		}
+		neighborCounts.add(neighbors.length);
+	}
+
+	Double neighborCount = null;
+
+	public double getAverageNeighborCount() {
+		if (neighborCount == null) {
+			if (neighborCounts.size() < 1) {
+				return 0;
+			}
+			int sum = 0;
+			for (int count : neighborCounts) {
+				sum += count;
+			}
+			neighborCount = ((double) sum) / ((double) neighborCounts.size());
+			System.err.println("average neighbor count is " + neighborCount);
+		}
+		return neighborCount;
 	}
 
 	public void setRegionAsWasteland(int id) {
@@ -53,6 +73,10 @@ public class Map {
 
 	public Region getRegion(int id) {
 		return regions.get(id);
+	}
+
+	public int getRegionCount() {
+		return regions.size();
 	}
 
 	public SuperRegion getSuperRegion(int id) {

@@ -2,7 +2,6 @@ package de.beheh.warlight2.io;
 
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
-import de.beheh.warlight2.mock.MockBot;
 import de.beheh.warlight2.mock.MockRequestProcessor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

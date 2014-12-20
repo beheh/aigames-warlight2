@@ -1,7 +1,6 @@
 package de.beheh.warlight2.stats;
 
-import de.beheh.warlight2.game.map.Region;
-import java.util.List;
+import de.beheh.warlight2.game.map.SuperRegion;
 
 /**
  *
@@ -9,17 +8,15 @@ import java.util.List;
  */
 public class SuperRegionRank extends Rank {
 
-	protected int bonus;
-	protected List<Region> regions;
-
-	public SuperRegionRank(int bonus, List<Region> regions) {
-		this.bonus = bonus;
-		this.regions = regions;
+	protected SuperRegion superRegion;
+	
+	public SuperRegionRank(SuperRegion superRegion) {
+		this.superRegion = superRegion;
 	}
 
 	@Override
 	public double getScore() {
-		return (2 * bonus) - Math.pow(regions.size(), 2);
+		return (2 * superRegion.getBonus()) - Math.pow(superRegion.getRegionCount(), 2);
 	}
 
 }

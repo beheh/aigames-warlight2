@@ -9,9 +9,11 @@ import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
 import de.beheh.warlight2.stats.Ranking;
+import de.beheh.warlight2.stats.ReinforcementRank;
 import de.beheh.warlight2.stats.SuperRegionRank;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +27,10 @@ public class Quickstep extends Bot {
 		super(gameTracker);
 	}
 
+	protected void deadline(String message) {
+		System.err.println("Deadline constraint: terminating after ");
+	}
+
 	Ranking<SuperRegion> superRegionRanking = new Ranking<>();
 
 	@Override
@@ -33,7 +39,7 @@ public class Quickstep extends Bot {
 		System.err.println(map.toString());
 		// calculate base value for all superregions
 		for (SuperRegion superRegion : map.getSuperRegions()) {
-			superRegionRanking.addObject(superRegion, new SuperRegionRank(superRegion.getBonus(), superRegion.getRegions()));
+			superRegionRanking.addObject(superRegion, new SuperRegionRank(superRegion));
 		}
 	}
 
@@ -80,99 +86,124 @@ public class Quickstep extends Bot {
 		}
 	}
 
+	protected int getRequiredArmies(int armyCount) {
+		return Math.round(armyCount * 1.6f);
+	}
+
 	@Override
-	public Command placeArmies(int armyCount) {
+	public PlaceArmiesCommand placeArmies(int armyCount) {
 		Map map = gameTracker.getMap();
 		PlaceArmiesCommand command = new PlaceArmiesCommand(gameTracker);
 
 		// pick a random owned region
+		Ranking<Region> regionRanking = new Ranking<>();
 		List<Region> ownRegions = map.getRegionsByPlayer(gameTracker.getPlayer());
-		for (int remaining = armyCount; remaining > 0; remaining--) {
+		for (Region region : ownRegions) {
+			regionRanking.addObject(region, new ReinforcementRank(region));
+		}
+
+		List<Region> rankList = regionRanking.getRankList();
+		if (rankList.size() > 0) {
+			Region target = rankList.get(0);
+			command.placeArmy(target, armyCount);
+			target.increaseArmyCount(armyCount);
+		} else {
+			// pick a random region
 			Random rand = new Random();
-			command.placeArmy(ownRegions.get(rand.nextInt(ownRegions.size())), 1);
+			for (int remaining = armyCount; armyCount > 0; armyCount--) {
+				Region target = ownRegions.get(rand.nextInt(ownRegions.size()));
+				command.placeArmy(target, armyCount);
+				target.increaseArmyCount(armyCount);
+			}
 		}
 		return command;
 	}
 
 	@Override
-	public Command attackTransfer() {
+	public AttackTransferCommand attackTransfer() {
 		Map map = gameTracker.getMap();
 		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
 
-		// find secure areas to move away from
-		// find easy targets from all owned regions
-		List<Region> ownRegions = map.getRegionsByPlayer(gameTracker.getPlayer());
-		for (Region region : ownRegions) {
-			int armycount = region.getArmyCount();
-			if(armycount < 2) {
-				continue;
-			}
-			for (Region neighbor : region.getNeighbors()) {
-				if (gameTracker.getPlayer().equals(neighbor.getOwner())) {
+		try {
+			// find secure areas to move away from
+
+			List<Region> ownRegions = map.getRegionsByPlayer(gameTracker.getPlayer());
+
+			for (Region region : ownRegions) {
+				// can attack/transfer all but the last one
+				int freeArmies = region.getArmyCount() - 1;
+
+				//how many armies can attack us?
+				int potentialAttackers = region.getPotentialAttackers();
+				// how many armies do we need to defend this region?
+				potentialAttackers = potentialAttackers * 2 / 3; // let's be optimistic
+				// we want do defend with some, so don't move them anywhere
+				if (potentialAttackers <= freeArmies) {
+					freeArmies -= potentialAttackers;
+				}
+
+				// can we attack something with the rest?
+				for (Region neighbor : region.getNeighbors()) {
+					if (gameTracker.getOpponent().equals(neighbor.getOwner())) {
+						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
+						if (freeArmies >= requiredArmies) {
+							command.attack(region, neighbor, requiredArmies);
+							region.decreaseArmyCount(requiredArmies);
+							neighbor.increaseArmyCount(requiredArmies);
+							freeArmies -= requiredArmies;
+						}
+					}
+				}
+
+				// we're done
+				if (freeArmies < 2) {
 					continue;
 				}
-				if (armycount * 4 / 3 > neighbor.getArmyCount() + 1) {
-					command.attack(region, neighbor, armycount - 1);
-					region.setArmyCount(1);
-					break;
+
+				// anything neutral to capture?
+				for (Region neighbor : region.getNeighbors()) {
+					if (neighbor.getOwner() == null) {
+						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
+						if (freeArmies >= requiredArmies) {
+							command.attack(region, neighbor, requiredArmies);
+							region.decreaseArmyCount(requiredArmies);
+							neighbor.increaseArmyCount(requiredArmies);
+							freeArmies -= requiredArmies;
+						}
+					}
+				}
+
+				// can't move the last remaining army away
+				if (freeArmies < 2) {
+					continue;
+				}
+
+				// nothing worth attacking or defending for some armies, so move to best region
+				Region target = region;
+				int targetEnemyDistance = -1;
+				for (Region neighbor : region.getNeighbors()) {
+					if (region.getOwner() == neighbor.getOwner()) {
+						// awesome! lets go there
+						int neighborDistance = neighbor.playerDistance(gameTracker.getOpponent(), 4);
+						if (neighbor.getPotentialAttackers() > target.getPotentialAttackers() || (neighborDistance != -1 && (targetEnemyDistance == -1 || neighborDistance < targetEnemyDistance))) {
+							target = neighbor;
+							targetEnemyDistance = neighborDistance;
+						}
+					}
+				}
+				// move all but one
+				if (target != region) {
+					command.transfer(region, target, freeArmies);
+					region.decreaseArmyCount(freeArmies);
+					target.increaseArmyCount(freeArmies);
+					freeArmies = 0;
 				}
 			}
+		} catch (RuntimeException e) {
+			e.printStackTrace(System.err);
+			return command;
 		}
-		// move to better places
-		for (Region region : ownRegions) {
-			Region closest = region;
-			for (Region neighbor : region.getNeighbors()) {
-				if (!gameTracker.getPlayer().equals(neighbor.getOwner())) {
-					continue;
-				}
-				if(region.getArmyCount() < 2) {
-					continue;
-				}
-				if (neighbor.playerDistance(gameTracker.getOpponent()) < closest.playerDistance(gameTracker.getOpponent())) {
-					closest = neighbor;
-				}
-			}
-			if (closest != region) {
-				command.transfer(region, closest, region.getArmyCount() - 1);
-				region.setArmyCount(1);
-			}
-		}
+
 		return command;
-	}
-
-//	List<RegionRank> prioritizedRegions = null;
-	@Override
-	public void onRoundComplete() {
-		rankRegions();
-	}
-
-	protected void rankRegions() {
-	//	prioritizedRegions = new ArrayList<RegionRank>();
-		//Map map = gameTracker.getMap();
-		// check for filling of SuperRegions
-		/*List<SuperRegion> superRegions = map.getSuperRegions();
-		 for (SuperRegion superRegion : superRegions) {
-		 List<Region> missingPlayerRegions = superRegion.missingRegions(gameTracker.getPlayer());
-		 System.err.println(missingPlayerRegions.size() + " missing for SuperRegion " + superRegion);
-		 if (missingPlayerRegions.size() > 0) {
-		 float score = superRegion.getBonus() * (1.0f / missingPlayerRegions.size());
-		 for (Region region : missingPlayerRegions) {
-		 prioritizedRegions.add(new RegionRank(score, region));
-		 }
-		 }
-		 }
-		 // seep into neighbors
-		 Iterator<RegionRank> iterator = prioritizedRegions.iterator();
-		 while (iterator.hasNext()) {
-		 RegionRank regionRank = iterator.next();
-		 }*/
-
-		// higher score for smaller superregion
-		//Collections.sort(prioritizedRegions, new Comparator<RegionRank>() {
-		//	@Override
-		//	public int compare(RegionRank rr1, RegionRank rr2) {
-		//		return Float.compare(rr1.getRank(), rr2.getRank());
-		//	}
-		//});
 	}
 }

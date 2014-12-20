@@ -1,8 +1,10 @@
 package de.beheh.warlight2.bot;
 
+import de.beheh.warlight2.bot.command.AttackTransferCommand;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.bot.command.Command;
+import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
 import de.beheh.warlight2.game.map.Region;
 
 /**
@@ -23,9 +25,9 @@ public abstract class Bot {
 
 	public abstract Region pickStartingRegion(Region[] regions);
 
-	public abstract Command placeArmies(int armyCount);
+	public abstract PlaceArmiesCommand placeArmies(int armyCount);
 
-	public abstract Command attackTransfer();
+	public abstract AttackTransferCommand attackTransfer();
 
 	/* Callbacks */
 	

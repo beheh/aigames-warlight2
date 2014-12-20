@@ -2,6 +2,7 @@ package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,6 +59,14 @@ public class Region extends AbstractRegion {
 		this.armycount = armies;
 	}
 
+	public void increaseArmyCount(int by) {
+		armycount += by;
+	}
+
+	public void decreaseArmyCount(int by) {
+		armycount -= by;
+	}
+
 	public int getArmyCount() {
 		return armycount;
 	}
@@ -74,9 +83,14 @@ public class Region extends AbstractRegion {
 
 	protected boolean isSearching = false;
 
+	private HashMap<Region, Integer> distances = new HashMap<>();
+
 	public int distanceTo(Region region) {
 		if (region.equals(this)) {
 			return 0;
+		}
+		if (distances.containsKey(region)) {
+			return distances.get(region);
 		}
 		if (isSearching) {
 			return -1;
@@ -91,10 +105,18 @@ public class Region extends AbstractRegion {
 			}
 		}
 		isSearching = false;
+		distances.put(region, shortestDistance);
 		return shortestDistance;
 	}
 
 	public int playerDistance(Player player) {
+		return playerDistance(player, 5);
+	}
+
+	public int playerDistance(Player player, int maxDepth) {
+		if (maxDepth == 0) {
+			return -1;
+		}
 		if (owner != null && owner.equals(player)) {
 			return 0;
 		}
@@ -105,7 +127,7 @@ public class Region extends AbstractRegion {
 		int shortestDistance = -1;
 		isSearching = true;
 		while (iterator.hasNext()) {
-			int distance = iterator.next().playerDistance(player);
+			int distance = iterator.next().playerDistance(player, maxDepth - 1);
 			if (distance != -1 && (shortestDistance == -1 || distance < shortestDistance)) {
 				shortestDistance = distance + 1;
 			}
@@ -122,6 +144,16 @@ public class Region extends AbstractRegion {
 
 	public Integer getLastUpdate() {
 		return lastUpdate;
+	}
+
+	public int getPotentialAttackers() {
+		int potentialAttackers = 0;
+		for(Region neighbor : neighbors) {
+			if(neighbor.getOwner() != null && (owner == null || !owner.equals(neighbor.getOwner()))) {
+				potentialAttackers += neighbor.getArmyCount();
+			}
+		}
+		return potentialAttackers;
 	}
 
 }

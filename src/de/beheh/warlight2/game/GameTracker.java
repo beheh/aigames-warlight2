@@ -98,4 +98,22 @@ public class GameTracker {
 	public int getRound() {
 		return round;
 	}
+	
+	long deadline = 0;
+	
+	public void setTime(long time) {
+		deadline = System.currentTimeMillis() + time;
+	}
+	
+	public long getRemainingTime() {
+		long current = System.currentTimeMillis();
+		if(current >= deadline) {
+			return 0;
+		}
+		return deadline - current;
+	}
+	
+	public boolean hasRemainingTime() {
+		return getRemainingTime() > 0;
+	}
 }
