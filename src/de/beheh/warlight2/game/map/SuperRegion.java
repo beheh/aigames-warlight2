@@ -83,4 +83,14 @@ public class SuperRegion extends AbstractRegion {
 		}
 		return missingRegions;
 	}
+
+	public int getWastelandCount() {
+		int wastelandCount = 0;
+		for(Region region : regions) {
+			if(region.isWasteland()) {
+				wastelandCount++;
+			}
+		}
+		return wastelandCount;
+	}
 }
