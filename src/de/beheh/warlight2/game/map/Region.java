@@ -1,7 +1,10 @@
 package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
+import de.beheh.warlight2.stats.ScoreSorter;
+import de.beheh.warlight2.stats.Scorer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +52,20 @@ public class Region extends AbstractRegion {
 		return neighbors;
 	}
 
+	public List<Region> getNeutralNeighbors() {
+		return getNeighborsByPlayer(null);
+	}
+
+	public List<Region> getNeighborsByPlayer(Player player) {
+		List<Region> playerNeighbors = new ArrayList<>(neighbors.size());
+		for (Region neighbor : neighbors) {
+			if (neighbor.isOwnedBy(player)) {
+				playerNeighbors.add(neighbor);
+			}
+		}
+		return neighbors;
+	}
+
 	public boolean isNeighbor(Region neighbor) {
 		return neighbors.contains(neighbor);
 	}
@@ -88,34 +105,62 @@ public class Region extends AbstractRegion {
 		return owner;
 	}
 
+	public boolean isOwnedBy(Player player) {
+		if (player == null) {
+			return owner == null;
+		}
+		return player.equals(owner);
+	}
+
+	public boolean isNeutral() {
+		return owner == null;
+	}
+
 	protected boolean isSearching = false;
 
-	private HashMap<Region, Integer> distances = new HashMap<>();
+	public Route routeTo(Region region) {
+		return routeTo(region, null);
+	}
 
-	public int distanceTo(Region region) {
-		if (region.equals(this)) {
-			return 0;
+	public Route routeTo(Region region, Scorer<Region> scorer) {
+		if (region == null) {
+			throw new IllegalArgumentException("region can\'t be null");
 		}
-		if (distances.containsKey(region)) {
-			return distances.get(region);
+		if (this.equals(region)) {
+			// return empty route if we are actual target region (length will b e0)
+			return new Route();
 		}
 		if (isSearching) {
-			return -1;
+			return null;
 		}
-		Iterator<Region> iterator = neighbors.iterator();
-		int shortestDistance = -1;
+		Route bestRoute = null;
 		isSearching = true;
-		while (iterator.hasNext()) {
-			int distance = iterator.next().distanceTo(region);
-			if (distance != -1 && (shortestDistance == -1 || distance < shortestDistance)) {
-				shortestDistance = distance + 1;
+		List<Region> sortedNeighbors = new ArrayList<>(neighbors);
+		if (scorer != null) {
+			ScoreSorter.sort(sortedNeighbors, scorer);
+		}
+		for (Region neighbor : sortedNeighbors) {
+			Route neighborRoute = neighbor.routeTo(region);
+			if (neighborRoute == null) {
+				continue;
+			}
+			neighborRoute.addBefore(region);
+			//System.out.println("from " + neighbor + " to " + region + ": got route length " + neighborRoute.length());
+			if (bestRoute == null || neighborRoute.length() < bestRoute.length()) {
+				bestRoute = neighborRoute;
 			}
 		}
 		isSearching = false;
-		if (shortestDistance != -1) {
-			distances.put(region, shortestDistance);
+		//System.out.println(Arrays.toString(route.getRoute().toArray()));
+		return bestRoute;
+	}
+
+	public int distanceTo(Region region) {
+		Route route = routeTo(region);
+		if (route == null) {
+			return -1;
 		}
-		return shortestDistance;
+		return route.length();
 	}
 
 	public int playerDistance(Player player) {

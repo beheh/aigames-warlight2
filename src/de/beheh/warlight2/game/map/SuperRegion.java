@@ -22,6 +22,11 @@ public class SuperRegion extends AbstractRegion {
 		this.bonus = bonus;
 	}
 
+	/**
+	 * Returns the regions bonus.
+	 *
+	 * @return the regions bonus
+	 */
 	public int getBonus() {
 		return bonus;
 	}
@@ -51,33 +56,31 @@ public class SuperRegion extends AbstractRegion {
 	}
 
 	public int getOwnedRegionCount(Player player) {
-		// @todo optimize with direct counting
 		return getOwnedRegions(player).size();
 	}
 
 	public List<Region> getOwnedRegions(Player player) {
 		List<Region> ownedRegions = new ArrayList<>();
-		Iterator<Region> iterator = ownedRegions.iterator();
-		while (iterator.hasNext()) {
-			Region region = iterator.next();
-			if (region.getOwner().equals(player)) {
+		for (Region region : regions) {
+			if (region.isOwnedBy(player)) {
 				ownedRegions.add(region);
 			}
 		}
 		return ownedRegions;
 	}
 
+	public List<Region> getNeutralRegions() {
+		return getOwnedRegions(null);
+	}
+
 	public int getMissingRegionCount(Player player) {
-		// @todo optimize with direct counting
 		return getMissingRegions(player).size();
 	}
 
 	public List<Region> getMissingRegions(Player player) {
 		List<Region> missingRegions = new ArrayList<>();
-		Iterator<Region> iterator = regions.iterator();
-		while (iterator.hasNext()) {
-			Region region = iterator.next();
-			if (!player.equals(region.getOwner())) {
+		for (Region region : regions) {
+			if (!region.isOwnedBy(player)) {
 				missingRegions.add(region);
 			}
 		}
@@ -86,8 +89,8 @@ public class SuperRegion extends AbstractRegion {
 
 	public int getWastelandCount() {
 		int wastelandCount = 0;
-		for(Region region : regions) {
-			if(region.isWasteland()) {
+		for (Region region : regions) {
+			if (region.isWasteland()) {
 				wastelandCount++;
 			}
 		}
