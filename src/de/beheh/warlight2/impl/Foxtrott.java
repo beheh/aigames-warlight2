@@ -7,7 +7,6 @@ import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
-import de.beheh.warlight2.stats.ScoreSorter;
 import de.beheh.warlight2.stats.Scorer;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +29,10 @@ public class Foxtrott extends Bot {
 			// static rank => Bonus/TakeOverDifficulty of SuperRegion
 			double staticScore = superRegion.getBonus() / (superRegion.getRegionCount());
 			// dynamic rank =>
-			double dynamicScore = superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size());
+			double dynamicScore = 0;
+			if (!region.isOwnedBy(gameTracker.getPlayer())) {
+				dynamicScore = superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size());
+			}
 			return staticScore * 1 + dynamicScore * 1;
 		}
 	}
@@ -39,7 +41,7 @@ public class Foxtrott extends Bot {
 	public Region pickStartingRegion(Region[] regions) {
 		// choose region with higher static/dynamic rank
 		List<Region> startRegionList = Arrays.asList(regions);
-		ScoreSorter.sort(startRegionList, new RegionDesirabilityScorer());
+		startRegionList.sort(new RegionDesirabilityScorer());
 		return regions[0];
 	}
 
@@ -49,7 +51,7 @@ public class Foxtrott extends Bot {
 
 		Map map = gameTracker.getMap();
 		List<Region> ownedRegionsList = map.getRegionsByPlayer(gameTracker.getPlayer());
-		ScoreSorter.sort(ownedRegionsList, new Scorer<Region>() {
+		ownedRegionsList.sort(new Scorer<Region>() {
 
 			@Override
 			protected double score(Region region) {
@@ -64,10 +66,32 @@ public class Foxtrott extends Bot {
 		return command;
 	}
 
+	protected class RegionAttackTransferDecisionScorer extends Scorer<Region> {
+
+		private final Region origin;
+
+		public RegionAttackTransferDecisionScorer(Region origin) {
+			this.origin = origin;
+		}
+
+		@Override
+		public double score(Region region) {
+			return 0;
+		}
+	}
+
 	@Override
 	public AttackTransferCommand attackTransfer() {
 		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
 
+		Map map = gameTracker.getMap();
+
+		// rank surrounding regions
+		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+			List<Region> neighbors = region.getNeighbors();
+			neighbors.sort(new RegionAttackTransferDecisionScorer(region));
+		}
+		
 		return command;
 	}
 }
