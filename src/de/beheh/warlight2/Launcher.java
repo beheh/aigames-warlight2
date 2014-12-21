@@ -20,7 +20,7 @@ public class Launcher {
 	public static void main(String[] args) {
 		try {
 			GameTracker gameTracker = new GameTracker();
-			Bot bot = new Quickstep(gameTracker);
+			Bot bot = new Foxtrott(gameTracker);
 			MapHandler mapHandler = new MapHandler(gameTracker);
 			CommandProcessor requestProcessor = new CommandProcessor(gameTracker, bot);
 			CommunicationHandler communicationHandler = new CommunicationHandler(System.in, System.out, mapHandler, gameTracker, requestProcessor);
