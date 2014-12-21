@@ -6,9 +6,9 @@ import de.beheh.warlight2.io.CommandProcessor;
  *
  * @author Benedict Etzel <developer@beheh.de>
  */
-public class MockRequestProcessor extends CommandProcessor {
+public class MockCommandProcessor extends CommandProcessor {
 
-	public MockRequestProcessor() {
+	public MockCommandProcessor() {
 		super(null, null);
 	}
 
