@@ -13,12 +13,12 @@ import de.beheh.warlight2.game.map.Region;
  *
  * @author Benedict Etzel <developer@beheh.de>
  */
-public class RequestProcessor {
+public class CommandProcessor {
 
 	protected GameTracker gameTracker;
 	protected Bot bot;
 
-	public RequestProcessor(GameTracker gameTracker, Bot bot) {
+	public CommandProcessor(GameTracker gameTracker, Bot bot) {
 		this.gameTracker = gameTracker;
 		this.bot = bot;
 	}

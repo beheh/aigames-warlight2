@@ -1,12 +1,12 @@
 package de.beheh.warlight2.mock;
 
-import de.beheh.warlight2.io.RequestProcessor;
+import de.beheh.warlight2.io.CommandProcessor;
 
 /**
  *
  * @author Benedict Etzel <developer@beheh.de>
  */
-public class MockRequestProcessor extends RequestProcessor {
+public class MockRequestProcessor extends CommandProcessor {
 
 	public MockRequestProcessor() {
 		super(null, null);

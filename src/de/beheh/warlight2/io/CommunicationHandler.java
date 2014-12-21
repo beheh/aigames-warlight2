@@ -20,9 +20,9 @@ public class CommunicationHandler {
 	private final PrintWriter writer;
 	private final MapHandler mapHandler;
 	private final GameTracker gameTracker;
-	private final RequestProcessor requestProcessor;
+	private final CommandProcessor requestProcessor;
 
-	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameTracker gameTracker, RequestProcessor requestProcessor) {
+	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameTracker gameTracker, CommandProcessor requestProcessor) {
 		this.scanner = new Scanner(input);
 		this.writer = new PrintWriter(output);
 		this.mapHandler = mapHandler;
