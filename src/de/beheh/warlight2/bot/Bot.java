@@ -8,7 +8,7 @@ import de.beheh.warlight2.game.map.Region;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public abstract class Bot {
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public abstract class ScoreSorter {
 

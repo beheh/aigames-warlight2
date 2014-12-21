@@ -2,7 +2,7 @@ package de.beheh.warlight2.game.map;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class AbstractRegion {
 

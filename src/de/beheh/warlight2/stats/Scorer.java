@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  * @param <E>
  */
 public abstract class Scorer<E> implements Comparator<E> {

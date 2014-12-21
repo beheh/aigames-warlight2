@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class Map {
 

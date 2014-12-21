@@ -4,7 +4,7 @@ import de.beheh.warlight2.game.map.Map;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class GameTracker {
 

@@ -4,7 +4,7 @@ import de.beheh.warlight2.game.GameTracker;
 
 /**
  *
- * @author benedict
+ * @author Benedict Etzel
  */
 public abstract class Command {
 

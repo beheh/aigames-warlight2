@@ -4,7 +4,7 @@ import de.beheh.warlight2.io.CommandProcessor;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class MockCommandProcessor extends CommandProcessor {
 

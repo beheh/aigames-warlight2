@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class SuperRegion extends AbstractRegion {
 

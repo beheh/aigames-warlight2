@@ -4,7 +4,7 @@ import de.beheh.warlight2.game.map.SuperRegion;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class SuperRegionRank extends Rank {
 

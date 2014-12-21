@@ -9,7 +9,7 @@ import java.io.OutputStreamWriter;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class MockServer implements Runnable {
 	

@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class RouteTest {
 

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /*
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class Quickstep extends Bot {
 

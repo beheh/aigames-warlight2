@@ -2,7 +2,7 @@ package de.beheh.warlight2.stats;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public abstract class Rank {
 

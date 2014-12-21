@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class MapHandler {
 

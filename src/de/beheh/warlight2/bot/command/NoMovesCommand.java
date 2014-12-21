@@ -2,7 +2,7 @@ package de.beheh.warlight2.bot.command;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class NoMovesCommand extends Command {
 

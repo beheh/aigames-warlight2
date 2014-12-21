@@ -11,7 +11,7 @@ import de.beheh.warlight2.game.map.Region;
  * Processes requests from the CommunicationHandler and returns the answer from
  * the bot.
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class CommandProcessor {
 

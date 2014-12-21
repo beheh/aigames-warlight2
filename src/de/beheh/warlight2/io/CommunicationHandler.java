@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author Benedict Etzel <developer@beheh.de>
+ * @author Benedict Etzel
  */
 public class CommunicationHandler {
 
