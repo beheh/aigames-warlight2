@@ -4,7 +4,7 @@ import de.beheh.warlight2.game.map.Region;
 
 /**
  *
- * @author benedict
+ * @author Benedict Etzel <developer@beheh.de>
  */
 public class RegionRank extends Rank {
 
