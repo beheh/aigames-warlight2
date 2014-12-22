@@ -4,12 +4,16 @@ import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.AttackTransferCommand;
 import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
 import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
+import de.beheh.warlight2.game.map.Route;
 import de.beheh.warlight2.game.map.SuperRegion;
 import de.beheh.warlight2.stats.Scorer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,16 +29,25 @@ public class Foxtrott extends Bot {
 	protected class RegionDesirabilityScorer extends Scorer<Region> {
 
 		@Override
+		protected int group(Region region) {
+			// highest priority: complete SuperRegions
+			SuperRegion superRegion = region.getSuperRegion();
+			if (superRegion.isOwnedBy(gameTracker.getPlayer())) {
+				return 1;
+			}
+			// @todo: lower priority: any amount of enemies around?
+			return 2;
+		}
+
+		@Override
 		public double score(Region region) {
 			SuperRegion superRegion = region.getSuperRegion();
-			// static rank => Bonus/TakeOverDifficulty of SuperRegion
 			double staticScore = superRegion.getBonus() / (superRegion.getRegionCount());
-			// dynamic rank =>
-			double dynamicScore = 0;
+			double takeoverScore = 0;
 			if (!region.isOwnedBy(gameTracker.getPlayer())) {
-				dynamicScore = superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size());
+				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size());
 			}
-			return staticScore * 1 + dynamicScore * 1;
+			return staticScore * 3 + takeoverScore * 1;
 		}
 	}
 
@@ -47,52 +60,171 @@ public class Foxtrott extends Bot {
 	}
 
 	@Override
-	public PlaceArmiesCommand placeArmies(int armyCount) {
+	public void onPickingComplete() {
+		updateBorder();
+	}
+
+	protected List<Region> border = new ArrayList<>();
+
+	public void updateBorder() {
+		Map map = gameTracker.getMap();
+
+		border = new ArrayList<>(map.getRegionCount());
+		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+			for (Region neighbor : region.getNeighbors()) {
+				if (border.contains(neighbor)) {
+					continue;
+				}
+				if (neighbor.isOwnedBy(gameTracker.getPlayer())) {
+					continue;
+				}
+				border.add(neighbor);
+			}
+		}
+		Collections.sort(border, new RegionDesirabilityScorer());
+	}
+
+	protected class RegionThreatScorer extends Scorer<Region> {
+
+		@Override
+		protected double score(Region region) {
+			return region.getPotentialAttackers();
+		}
+
+	}
+
+	@Override
+	public PlaceArmiesCommand placeArmies(int remainingArmies) {
 		PlaceArmiesCommand command = new PlaceArmiesCommand(gameTracker);
 
+		updateBorder();
+
 		Map map = gameTracker.getMap();
-		List<Region> ownedRegionsList = map.getRegionsByPlayer(gameTracker.getPlayer());
-		Collections.sort(ownedRegionsList, new Scorer<Region>() {
 
-			@Override
-			protected double score(Region region) {
-				return region.getArmyCount();
+		// the border really should not be empty
+		if (border.isEmpty()) {
+			System.err.println("border is empty");
+			return command;
+		}
+
+		for (Region borderNeighbor : border) {
+			List<Region> ourRegions = borderNeighbor.getNeighborsByPlayer(gameTracker.getPlayer());
+			Collections.sort(ourRegions, new RegionThreatScorer());
+			Region targetRegion = ourRegions.get(0);
+			if (remainingArmies > 0) {
+				targetRegion.increaseArmy(remainingArmies);
+				command.placeArmy(targetRegion, remainingArmies);
+				return command;
 			}
-		});
-
-		if (ownedRegionsList.size() > 0) {
-			command.placeArmy(ownedRegionsList.get(0), armyCount);
 		}
 
 		return command;
 	}
 
-	protected class RegionAttackTransferDecisionScorer extends Scorer<Region> {
+	protected class FriendlyRegionGrouper extends Scorer<Region> {
 
-		private final Region origin;
+		protected final Player player;
 
-		public RegionAttackTransferDecisionScorer(Region origin) {
-			this.origin = origin;
+		public FriendlyRegionGrouper(Player player) {
+			this.player = player;
 		}
 
 		@Override
-		public double score(Region region) {
-			return 0;
+		protected int group(Region region) {
+			if (region.isOwnedBy(player)) {
+				return 1;
+			}
+			return 2;
 		}
+
 	}
 
 	@Override
 	public AttackTransferCommand attackTransfer() {
 		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
 
+		updateBorder();
+
 		Map map = gameTracker.getMap();
 
-		// rank surrounding regions
-		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
-			List<Region> neighbors = region.getNeighbors();
-			Collections.sort(neighbors, new RegionAttackTransferDecisionScorer(region));
+		for (Region borderRegion : border) {
+			System.err.println("considering attack on " + borderRegion);
+			// border regions "pull" our border armies towards them
+			List<Region> ourRegions = borderRegion.getNeighborsByPlayer(gameTracker.getPlayer());
+			// prefer to take from lesser threatened regions
+			Collections.sort(ourRegions, new RegionDesirabilityScorer());
+			Collections.reverse(ourRegions);
+			// count our armies
+			int totalFreeArmies = 0;
+			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
+			System.err.println("we have " + ourRegions.size() + " regions we could use armies from");
+			for (Region region : ourRegions) {
+				int potentialAttackers = 0;
+				if (borderRegion.isHostile(gameTracker.getPlayer())) {
+					potentialAttackers = Math.max(region.getPotentialAttackers() - borderRegion.getArmyCount() - 1, 0);
+				} else {
+					potentialAttackers = Math.max(region.getPotentialAttackers(), 0);
+				}
+				System.err.println(region + " might be attacked by " + potentialAttackers + " other armies (" + region.getPotentialAttackers() + " surrounding - ones we would attack)");
+				int requiredDefenders = Math.round(1.5f * potentialAttackers);
+				System.err.println(region + " should therefore keep " + requiredDefenders + " armies");
+				int freeArmies = Math.max(region.getArmyCount() - requiredDefenders - 1, 0);
+				totalFreeArmies += freeArmies;
+				System.err.println("we can therefore reserve " + freeArmies + " to attack (have " + totalFreeArmies + " now)");
+				reservedArmies.put(region, freeArmies);
+			}
+
+			// go for it only if we have a slight advantage
+			if (Math.round(totalFreeArmies * 0.8f) > borderRegion.getArmyCount()) {
+				System.err.println("going for an attack on " + borderRegion + " (" + borderRegion.getArmyCount() + " armies), since we can easily spare " + totalFreeArmies + " armies");
+				// prevent overkill
+				int overkill = totalFreeArmies - borderRegion.getArmyCount();
+				overkill -= 0; //@todo enemy reinforcement heuristics
+				for (java.util.Map.Entry<Region, Integer> entry : reservedArmies.entrySet()) {
+					Region region = entry.getKey();
+					// lets take about 1.5 the amount the enemy has
+					int attackers = Math.min(Math.round(entry.getValue() * 1.5f) - Math.round(overkill / reservedArmies.size()), region.getArmyCount() - 1);
+					if (attackers > 0) {
+						command.attack(region, borderRegion, attackers);
+						region.decreaseArmy(attackers);
+						borderRegion.decreaseArmy(attackers);
+					}
+				}
+			}
 		}
-		
+
+		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+			int freeArmies = region.getArmyCount() - 1; // can use all but one army
+
+			// move remaining armies towards border
+			Collections.sort(border, new RegionDesirabilityScorer());
+			if (region.getPotentialAttackers() > 0) {
+				continue;
+			}
+
+			Route bestRoute = null;
+			for (Region borderRegion : border) {
+				Route route = region.routeTo(borderRegion, new FriendlyRegionGrouper(gameTracker.getPlayer()));
+				List<Region> routeList = route.getRoute();
+				for (Region routeRegion : routeList) {
+					boolean badRoute = false;
+					if (!routeRegion.isOwnedBy(gameTracker.getPlayer())) {
+						badRoute = true;
+					}
+					if (badRoute) {
+						continue;
+					}
+					if (bestRoute == null || route.length() > bestRoute.length()) {
+						bestRoute = route;
+					}
+				}
+			}
+
+			if (bestRoute != null) {
+				command.transfer(region, bestRoute.getFirst(), freeArmies);
+			}
+		}
+
 		return command;
 	}
 }
