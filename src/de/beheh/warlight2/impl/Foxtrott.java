@@ -221,6 +221,7 @@ public class Foxtrott extends Bot {
 			}
 
 			if (bestRoute != null) {
+				System.err.println("best route for region " + region + " is via " + bestRoute.getFirst());
 				command.transfer(region, bestRoute.getFirst(), freeArmies);
 			}
 		}
