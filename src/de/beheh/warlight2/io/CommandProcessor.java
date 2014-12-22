@@ -39,24 +39,40 @@ public class CommandProcessor {
 		for (int i = 0; i < regionIds.length; i++) {
 			regions[i] = map.getRegion(regionIds[i]);
 		}
-		Region region = bot.pickStartingRegion(regions);
-		System.err.println("pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
-		return region.toString();
+		try {
+			Region region = bot.pickStartingRegion(regions);
+			System.err.println("pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			return region.toString();
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			System.err.println("defaulting to region " + regionIds[0]);
+			return Integer.toString(regionIds[0]);
+		}
 	}
 
 	public String placeArmies(Long time) {
 		Long start = System.currentTimeMillis();
 		gameTracker.setTime(time);
-		Command command = bot.placeArmies(gameTracker.getStartingArmies());
-		System.err.println("Round #" + gameTracker.getRound() + ": placeArmies took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		Command command = null;
+		try {
+			command = bot.placeArmies(gameTracker.getStartingArmies());
+			System.err.println("Round #" + gameTracker.getRound() + ": placeArmies took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+		}
 		return commandToString(command);
 	}
 
 	public String attackTransfer(Long time) {
 		Long start = System.currentTimeMillis();
 		gameTracker.setTime(time);
-		Command command = bot.attackTransfer();
-		System.err.println("Round #" + gameTracker.getRound() + ": attackTransfer took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		Command command = null;
+		try {
+			command = bot.attackTransfer();
+			System.err.println("Round #" + gameTracker.getRound() + ": attackTransfer took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+		}
 		return commandToString(command);
 	}
 
