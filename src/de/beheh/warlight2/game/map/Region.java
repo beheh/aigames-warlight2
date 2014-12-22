@@ -4,8 +4,11 @@ import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.stats.Scorer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  *
@@ -41,7 +44,7 @@ public class Region extends AbstractRegion {
 	protected List<Region> neighbors = new ArrayList<>();
 
 	public void addNeighbor(Region neighbor) {
-		if (!neighbors.contains(neighbor)) {
+		if (!equals(neighbor) && !neighbors.contains(neighbor)) {
 			neighbors.add(neighbor);
 		}
 	}
@@ -122,43 +125,68 @@ public class Region extends AbstractRegion {
 		return !isNeutral() && !isOwnedBy(player);
 	}
 
-	protected boolean isSearching = false;
-
 	public Route routeTo(Region region) {
 		return routeTo(region, null);
 	}
 
 	public Route routeTo(Region region, Scorer<Region> scorer) {
 		if (region == null) {
-			throw new IllegalArgumentException("region can\'t be null");
+			throw new IllegalArgumentException("region cannot be null");
 		}
-		if (this.equals(region)) {
-			// return empty route if we are actual target region (length will b e0)
-			return new Route();
-		}
-		if (isSearching) {
-			return null;
-		}
-		Route bestRoute = null;
-		isSearching = true;
-		List<Region> sortedNeighbors = new ArrayList<>(neighbors);
-		if (scorer != null) {
-			Collections.sort(neighbors, scorer);
-		}
-		for (Region neighbor : sortedNeighbors) {
-			Route neighborRoute = neighbor.routeTo(region);
-			if (neighborRoute == null) {
-				continue;
+		HashMap<Region, Region> parents = new HashMap<>();
+		Queue<Region> searchQueue = new LinkedList<>();
+		searchQueue.add(this);
+		while (!searchQueue.isEmpty()) {
+			Region currentRegion = searchQueue.poll();
+			if (currentRegion.equals(region)) {
+				Route route = new Route();
+				Region parent = currentRegion;
+				while (!parent.equals(this)) {
+					route.add(parent);
+					parent = parents.get(parent);
+				}
+				return route;
 			}
-			neighborRoute.addBefore(region);
-			//System.out.println("from " + neighbor + " to " + region + ": got route length " + neighborRoute.length());
-			if (bestRoute == null || neighborRoute.length() < bestRoute.length()) {
-				bestRoute = neighborRoute;
+			List<Region> sortedNeighbors = new ArrayList<>(currentRegion.getNeighbors());
+			if (scorer != null) {
+				Collections.sort(neighbors, scorer);
+			}
+			for (Region neighbor : sortedNeighbors) {
+				if (neighbor.equals(this) || parents.containsKey(neighbor)) {
+					continue;
+				}
+				parents.put(neighbor, currentRegion);
+				searchQueue.add(neighbor);
 			}
 		}
-		isSearching = false;
-		//System.out.println(Arrays.toString(route.getRoute().toArray()));
-		return bestRoute;
+
+		return null;
+
+		/*
+		 if (isSearching) {
+		 return null;
+		 }
+
+		 Route bestRoute = null;
+		 isSearching = true;
+		 List<Region> sortedNeighbors = new ArrayList<>(neighbors);
+		 if (scorer != null) {
+		 Collections.sort(neighbors, scorer);
+		 }
+		 for (Region neighbor : sortedNeighbors) {
+		 Route neighborRoute = neighbor.routeTo(region);
+		 if (neighborRoute == null) {
+		 continue;
+		 }
+		 neighborRoute.addBefore(region);
+		 //System.out.println("from " + neighbor + " to " + region + ": got route length " + neighborRoute.length());
+		 if (bestRoute == null || neighborRoute.length() < bestRoute.length()) {
+		 bestRoute = neighborRoute;
+		 }
+		 }
+		 isSearching = false;
+		 //System.out.println(Arrays.toString(route.getRoute().toArray()));
+		 return bestRoute;*/
 	}
 
 	public int distanceTo(Region region) {
@@ -172,6 +200,8 @@ public class Region extends AbstractRegion {
 	public int playerDistance(Player player) {
 		return playerDistance(player, 5);
 	}
+
+	protected boolean isSearching = false;
 
 	public int playerDistance(Player player, int maxDepth) {
 		if (maxDepth == 0) {
