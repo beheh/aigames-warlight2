@@ -45,7 +45,7 @@ public class SuperRegion extends AbstractRegion {
 		return regions.size();
 	}
 
-	public boolean belongsTo(Player player) {
+	public boolean isOwnedBy(Player player) {
 		Iterator<Region> iterator = regions.iterator();
 		while (iterator.hasNext()) {
 			if (!iterator.next().getOwner().equals(player)) {
