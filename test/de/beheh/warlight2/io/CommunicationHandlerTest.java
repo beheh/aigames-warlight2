@@ -6,6 +6,7 @@ import de.beheh.warlight2.mock.MockCommandProcessor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -51,6 +52,13 @@ public class CommunicationHandlerTest {
 		CommunicationHandler.unknownCommand("test");
 	}
 
+	public class NullOutputStream extends OutputStream {
+
+		@Override
+		public void write(int b) throws IOException {
+		}
+	}
+
 	/**
 	 * Test of run method, of class CommunicationHandler.
 	 */
@@ -74,7 +82,7 @@ public class CommunicationHandlerTest {
 				+ "go place_armies 10000\n"
 				+ "go attack/transfer 10000\n").getBytes();
 		InputStream stream = new ByteArrayInputStream(input);
-		CommunicationHandler instance = new CommunicationHandler(stream, System.out, new MapHandler(gameTracker), gameTracker, requestProcessor);
+		CommunicationHandler instance = new CommunicationHandler(stream, new NullOutputStream(), new MapHandler(gameTracker), gameTracker, requestProcessor);
 		instance.run();
 		assertEquals(10000, gameTracker.getTimebank());
 		assertEquals(500, gameTracker.getTimePerMove());
@@ -91,5 +99,5 @@ public class CommunicationHandlerTest {
 		assertEquals(2, map.getRegion(1).distanceTo(map.getRegion(5)));
 		assertEquals(2, map.getRegion(5).distanceTo(map.getRegion(1)));
 	}
-	
+
 }
