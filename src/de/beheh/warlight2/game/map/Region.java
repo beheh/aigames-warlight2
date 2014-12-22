@@ -3,9 +3,7 @@ package de.beheh.warlight2.game.map;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.stats.Scorer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class Region extends AbstractRegion {
 				playerNeighbors.add(neighbor);
 			}
 		}
-		return neighbors;
+		return playerNeighbors;
 	}
 
 	public boolean isNeighbor(Region neighbor) {
