@@ -126,26 +126,35 @@ public class Region extends AbstractRegion {
 	}
 
 	public Route routeTo(Region region) {
-		return routeTo(region, null);
+		return routeTo(region, null, null);
+	}
+
+	public Route routeTo(Region region, Player player) {
+		return routeTo(region, player, null);
 	}
 
 	public Route routeTo(Region region, Scorer<Region> scorer) {
+		return routeTo(region, null, scorer);
+	}
+
+	public Route routeTo(Region region, Player player, Scorer<Region> scorer) {
 		if (region == null) {
 			throw new IllegalArgumentException("region cannot be null");
 		}
+		System.err.println("looking for route from " + this + " to " + region);
 		HashMap<Region, Region> parents = new HashMap<>();
 		Queue<Region> searchQueue = new LinkedList<>();
 		searchQueue.add(this);
 		while (!searchQueue.isEmpty()) {
 			Region currentRegion = searchQueue.poll();
 			if (currentRegion.equals(region)) {
-				Route route = new Route();
+				LinkedList<Region> routeList = new LinkedList<>();
 				Region parent = currentRegion;
 				while (!parent.equals(this)) {
-					route.add(parent);
+					routeList.addFirst(parent);
 					parent = parents.get(parent);
 				}
-				return route;
+				return new Route(routeList);
 			}
 			List<Region> sortedNeighbors = new ArrayList<>(currentRegion.getNeighbors());
 			if (scorer != null) {
@@ -153,6 +162,9 @@ public class Region extends AbstractRegion {
 			}
 			for (Region neighbor : sortedNeighbors) {
 				if (neighbor.equals(this) || parents.containsKey(neighbor)) {
+					continue;
+				}
+				if (player != null && !neighbor.isOwnedBy(player) && !neighbor.equals(region)) {
 					continue;
 				}
 				parents.put(neighbor, currentRegion);

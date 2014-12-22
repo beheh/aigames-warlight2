@@ -183,7 +183,7 @@ public class Foxtrott extends Bot {
 				for (java.util.Map.Entry<Region, Integer> entry : reservedArmies.entrySet()) {
 					Region region = entry.getKey();
 					// lets take about 1.5 the amount the enemy has
-					int attackers = Math.min(Math.round(entry.getValue() * 1.5f) - Math.round(overkill / reservedArmies.size()), region.getArmyCount() - 1);
+					int attackers = Math.min(Math.round(entry.getValue() * 1.5f) - Math.round(overkill / reservedArmies.size()) + 1, region.getArmyCount() - 1);
 					if (attackers > 0) {
 						command.attack(region, borderRegion, attackers);
 						region.decreaseArmy(attackers);
@@ -201,28 +201,37 @@ public class Foxtrott extends Bot {
 			if (region.getPotentialAttackers() > 0) {
 				continue;
 			}
+			
+			if (freeArmies < 1) {
+				continue;
+			}
+
+			System.err.println("starting path finding for region " + region);
 
 			Route bestRoute = null;
+			boolean alreadyAtBorder = false;
 			for (Region borderRegion : border) {
-				Route route = region.routeTo(borderRegion, new FriendlyRegionGrouper(gameTracker.getPlayer()));
-				List<Region> routeList = route.getRoute();
-				boolean badRoute = false;
-				for (Region routeRegion : routeList) {
-					if (!routeRegion.isOwnedBy(gameTracker.getPlayer())) {
-						badRoute = true;
-					}
+				if (region.isNeighbor(borderRegion)) {
+					alreadyAtBorder = true;
+					break;
 				}
-				if (badRoute) {
+				Route route = region.routeTo(borderRegion, gameTracker.getPlayer());
+				if (route == null) {
 					continue;
 				}
 				if (bestRoute == null || route.length() < bestRoute.length()) {
 					bestRoute = route;
 				}
 			}
-
+			if (alreadyAtBorder) {
+				System.err.println("region " + region + " already is neighbor of border - skipping");
+				continue;
+			}
 			if (bestRoute != null) {
-				System.err.println("best route for region " + region + " is via " + bestRoute.getFirst());
+				System.err.println("best route for region " + region + " to " + bestRoute.getLast() + " is via " + bestRoute.getFirst());
 				command.transfer(region, bestRoute.getFirst(), freeArmies);
+			} else {
+				System.err.println("this is impossible - some border should always be reachable");
 			}
 		}
 
