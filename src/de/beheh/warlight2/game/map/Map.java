@@ -2,12 +2,10 @@ package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  *
@@ -69,6 +67,7 @@ public class Map {
 		Region region = regions.get(id);
 		region.setOwner(owner);
 		region.setArmyCount(armycount);
+		region.resetSchedule();
 		region.setLastUpdate(round);
 	}
 

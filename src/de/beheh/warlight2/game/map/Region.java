@@ -100,6 +100,14 @@ public class Region extends AbstractRegion {
 		return armycount;
 	}
 
+	public int getScheduledArmyCount() {
+		return armycount + schedule;
+	}
+
+	public void resetSchedule() {
+		schedule = 0;
+	}
+
 	protected Player owner;
 
 	public void setOwner(Player owner) {
