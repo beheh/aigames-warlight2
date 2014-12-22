@@ -35,7 +35,7 @@ public class Foxtrott extends Bot {
 			if (superRegion.isOwnedBy(gameTracker.getPlayer())) {
 				return 1;
 			}
-			// high priority: complete enemy SuperRegion
+			// high priority: complete enemy SuperRegions
 			if (superRegion.isOwnedBy(gameTracker.getOpponent())) {
 				return 2;
 			}
@@ -46,12 +46,12 @@ public class Foxtrott extends Bot {
 		@Override
 		public double score(Region region) {
 			SuperRegion superRegion = region.getSuperRegion();
-			double staticScore = superRegion.getBonus() / (superRegion.getRegionCount() + superRegion.getWastelandCount() * 5);
+			double staticScore = superRegion.getBonus() / ((superRegion.getRegionCount() / 2) + superRegion.getWastelandCount() * 5);
 			double takeoverScore = 0;
 			if (!region.isOwnedBy(gameTracker.getPlayer())) {
 				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size()) / (superRegion.getWastelandCount() + 1);
 			}
-			return staticScore * 3 + takeoverScore * 1;
+			return staticScore * 5 + takeoverScore * 1;
 		}
 	}
 
@@ -166,6 +166,17 @@ public class Foxtrott extends Bot {
 		lastAttackTransferRound = gameTracker.getRound();
 	}
 
+	protected int predictPlayerBonus(Player player) {
+		Map map = gameTracker.getMap();
+		int bonus = 5;
+		for (SuperRegion superRegion : map.getSuperRegions()) {
+			if (superRegion.isOwnedBy(player)) {
+				bonus += superRegion.getBonus();
+			}
+		}
+		return bonus;
+	}
+
 	@Override
 	public AttackTransferCommand attackTransfer() {
 		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
@@ -189,11 +200,12 @@ public class Foxtrott extends Bot {
 			for (Region region : ourRegions) {
 				int potentialAttackers = 0;
 				if (borderRegion.isHostile(gameTracker.getPlayer())) {
-					potentialAttackers = Math.max(region.getPotentialAttackers() - borderRegion.getArmyCount() - 1, 0);
+					potentialAttackers = region.getPotentialAttackers() - borderRegion.getArmyCount();
+					potentialAttackers += predictPlayerBonus(borderRegion.getOwner());
 				} else {
-					potentialAttackers = Math.max(region.getPotentialAttackers(), 0);
+					potentialAttackers = region.getPotentialAttackers();
 				}
-				int requiredDefenders = requiredDefenders(potentialAttackers);
+				int requiredDefenders = requiredDefenders(Math.max(potentialAttackers, 0));
 				int freeArmies = Math.max(region.getArmyCount() - requiredDefenders - 1, 0);
 				totalFreeArmies += freeArmies;
 				reservedArmies.put(region, freeArmies);
@@ -203,9 +215,6 @@ public class Foxtrott extends Bot {
 			if (shouldAttack(totalFreeArmies, borderRegion.getArmyCount())) {
 				// prevent overkill
 				int overkill = totalFreeArmies - borderRegion.getArmyCount();
-				if (!borderRegion.isNeutral()) {
-					overkill -= 2; //@todo enemy reinforcement heuristics
-				}
 				for (java.util.Map.Entry<Region, Integer> entry : reservedArmies.entrySet()) {
 					Region region = entry.getKey();
 					// lets take about 1.5x the amount the enemy has
