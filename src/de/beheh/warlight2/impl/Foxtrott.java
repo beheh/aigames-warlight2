@@ -107,6 +107,7 @@ public class Foxtrott extends Bot {
 			return command;
 		}
 
+		// @todo spread armies out for multiple fronts
 		for (Region borderNeighbor : border) {
 			List<Region> ourRegions = borderNeighbor.getNeighborsByPlayer(gameTracker.getPlayer());
 			Collections.sort(ourRegions, new RegionThreatScorer());
