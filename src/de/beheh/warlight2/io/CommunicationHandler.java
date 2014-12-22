@@ -90,7 +90,7 @@ public class CommunicationHandler {
 								mapHandler.setWastelands(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							case "opponent_starting_regions":
-								//@todo
+								//@todo implement opponent_starting_regions
 								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
@@ -137,7 +137,7 @@ public class CommunicationHandler {
 								gameTracker.setStartingArmies(Integer.valueOf(parts[2]));
 								break;
 							case "starting_regions":
-								//@todo
+								//@todo implement starting_regions
 								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
