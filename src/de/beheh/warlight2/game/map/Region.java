@@ -85,6 +85,10 @@ public class Region extends AbstractRegion {
 		schedule = 0;
 	}
 
+	public void increaseArmy(int by) {
+		armycount += by;
+	}
+
 	public void decreaseArmy(int by) {
 		armycount -= by;
 	}
@@ -112,6 +116,10 @@ public class Region extends AbstractRegion {
 
 	public boolean isNeutral() {
 		return owner == null;
+	}
+
+	public boolean isHostile(Player player) {
+		return !isNeutral() && !isOwnedBy(player);
 	}
 
 	protected boolean isSearching = false;
@@ -201,7 +209,7 @@ public class Region extends AbstractRegion {
 	public int getPotentialAttackers() {
 		int potentialAttackers = 0;
 		for (Region neighbor : neighbors) {
-			if (neighbor.getOwner() != null && (owner == null || !owner.equals(neighbor.getOwner()))) {
+			if (neighbor.isHostile(owner)) {
 				potentialAttackers += neighbor.getArmyCount() - 1;
 			}
 		}
