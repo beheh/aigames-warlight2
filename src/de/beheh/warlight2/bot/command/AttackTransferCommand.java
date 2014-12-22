@@ -34,10 +34,10 @@ public class AttackTransferCommand extends Command {
 
 	public void move(Region from, Region to, int armyCount) {
 		if(from == null || to == null) {
-			throw new RuntimeException("from/to can't be null");
+			throw new IllegalArgumentException("from/to can't be null");
 		}
 		if(armyCount < 1) {
-			throw new RuntimeException("invalid armyCount "+armyCount);
+			throw new IllegalArgumentException("invalid armyCount "+armyCount);
 		}
 		movements.add(new Movement(from, to, armyCount));
 	}
