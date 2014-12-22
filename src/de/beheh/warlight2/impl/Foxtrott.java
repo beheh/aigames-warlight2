@@ -35,8 +35,12 @@ public class Foxtrott extends Bot {
 			if (superRegion.isOwnedBy(gameTracker.getPlayer())) {
 				return 1;
 			}
+			// high priority: complete enemy SuperRegion
+			if (superRegion.isOwnedBy(gameTracker.getOpponent())) {
+				return 2;
+			}
 			// @todo: lower priority: any amount of enemies around?
-			return 2;
+			return 3;
 		}
 
 		@Override
@@ -140,6 +144,23 @@ public class Foxtrott extends Bot {
 
 	}
 
+	protected boolean shouldAttack(int attackers, int defenders) {
+		float factor = 0.8f;
+		factor += Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * 0.1f;
+		return Math.round(attackers * factor) > defenders;
+	}
+
+	protected int requiredDefenders(int potentialAttackers) {
+		float factor = Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * 0.1f;
+		return Math.round((1.5f - factor) * potentialAttackers);
+	}
+
+	protected int lastAttackTransferRound = 0;
+
+	protected void updateLastAttackTransferRound() {
+		lastAttackTransferRound = gameTracker.getRound();
+	}
+
 	@Override
 	public AttackTransferCommand attackTransfer() {
 		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
@@ -149,16 +170,17 @@ public class Foxtrott extends Bot {
 		Map map = gameTracker.getMap();
 
 		for (Region borderRegion : border) {
-			System.err.println("considering attack on " + borderRegion);
+
 			// border regions "pull" our border armies towards them
 			List<Region> ourRegions = borderRegion.getNeighborsByPlayer(gameTracker.getPlayer());
+
 			// prefer to take from lesser threatened regions
 			Collections.sort(ourRegions, new RegionDesirabilityScorer());
 			Collections.reverse(ourRegions);
+
 			// count our armies
 			int totalFreeArmies = 0;
 			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
-			System.err.println("we have " + ourRegions.size() + " regions we could use armies from");
 			for (Region region : ourRegions) {
 				int potentialAttackers = 0;
 				if (borderRegion.isHostile(gameTracker.getPlayer())) {
@@ -166,29 +188,28 @@ public class Foxtrott extends Bot {
 				} else {
 					potentialAttackers = Math.max(region.getPotentialAttackers(), 0);
 				}
-				System.err.println(region + " might be attacked by " + potentialAttackers + " other armies (" + region.getPotentialAttackers() + " surrounding - ones we would attack)");
-				int requiredDefenders = Math.round(1.5f * potentialAttackers);
-				System.err.println(region + " should therefore keep " + requiredDefenders + " armies");
+				int requiredDefenders = requiredDefenders(potentialAttackers);
 				int freeArmies = Math.max(region.getArmyCount() - requiredDefenders - 1, 0);
 				totalFreeArmies += freeArmies;
-				System.err.println("we can therefore reserve " + freeArmies + " to attack (have " + totalFreeArmies + " now)");
 				reservedArmies.put(region, freeArmies);
 			}
 
 			// go for it only if we have a slight advantage
-			if (Math.round(totalFreeArmies * 0.8f) > borderRegion.getArmyCount()) {
-				System.err.println("going for an attack on " + borderRegion + " (" + borderRegion.getArmyCount() + " armies), since we can easily spare " + totalFreeArmies + " armies");
+			if (shouldAttack(totalFreeArmies, borderRegion.getArmyCount())) {
 				// prevent overkill
 				int overkill = totalFreeArmies - borderRegion.getArmyCount();
-				overkill -= 0; //@todo enemy reinforcement heuristics
+				if (!borderRegion.isNeutral()) {
+					overkill -= 2; //@todo enemy reinforcement heuristics
+				}
 				for (java.util.Map.Entry<Region, Integer> entry : reservedArmies.entrySet()) {
 					Region region = entry.getKey();
-					// lets take about 1.5 the amount the enemy has
+					// lets take about 1.5x the amount the enemy has
 					int attackers = Math.min(Math.round(entry.getValue() * 1.5f) - Math.round(overkill / reservedArmies.size()) + 1, region.getArmyCount() - 1);
 					if (attackers > 0) {
 						command.attack(region, borderRegion, attackers);
 						region.decreaseArmy(attackers);
 						borderRegion.decreaseArmy(attackers);
+						updateLastAttackTransferRound();
 					}
 				}
 			}
@@ -199,15 +220,11 @@ public class Foxtrott extends Bot {
 
 			// move remaining armies towards border
 			Collections.sort(border, new RegionDesirabilityScorer());
-			if (region.getPotentialAttackers() > 0) {
-				continue;
-			}
-			
+			freeArmies -= requiredDefenders(region.getPotentialAttackers());
+
 			if (freeArmies < 1) {
 				continue;
 			}
-
-			System.err.println("starting path finding for region " + region);
 
 			Route bestRoute = null;
 			boolean alreadyAtBorder = false;
@@ -224,15 +241,50 @@ public class Foxtrott extends Bot {
 					bestRoute = route;
 				}
 			}
+
 			if (alreadyAtBorder) {
-				System.err.println("region " + region + " already is neighbor of border - skipping");
+
+				// check if neighboring regions need support
+				List<Region> neighbors = region.getNeighborsByPlayer(gameTracker.getPlayer());
+				if (neighbors.isEmpty()) {
+					continue;
+				}
+
+				Collections.sort(neighbors, new Scorer<Region>() {
+
+					@Override
+					protected double score(Region region) {
+						return region.getPotentialAttackers();
+					}
+
+				});
+				for (Region neighbor : neighbors) {
+					if (freeArmies < 1) {
+						break;
+					}
+
+					int requiredDefenders = requiredDefenders(neighbor.getPotentialAttackers()) - neighbor.getScheduledArmyCount();
+					int transferArmies = Math.max(requiredDefenders, 0);
+					if (transferArmies < 1) {
+						continue;
+					}
+
+					command.transfer(region, neighbor, transferArmies);
+					region.decreaseArmy(transferArmies);
+					neighbor.scheduleIncreaseArmy(transferArmies);
+					updateLastAttackTransferRound();
+				}
 				continue;
 			}
 			if (bestRoute != null) {
-				System.err.println("best route for region " + region + " to " + bestRoute.getLast() + " is via " + bestRoute.getFirst());
-				command.transfer(region, bestRoute.getFirst(), freeArmies);
+				// move along route towards border
+				Region target = bestRoute.getFirst();
+				command.transfer(region, target, freeArmies);
+				region.decreaseArmy(freeArmies);
+				target.increaseArmy(freeArmies);
+				updateLastAttackTransferRound();
 			} else {
-				System.err.println("this is impossible - some border should always be reachable");
+				System.err.println("error: cannot reach any border from " + region);
 			}
 		}
 
