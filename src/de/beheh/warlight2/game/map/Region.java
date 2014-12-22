@@ -38,7 +38,7 @@ public class Region extends AbstractRegion {
 	}
 
 	public boolean isWasteland() {
-		return wasteland;
+		return wasteland && isNeutral();
 	}
 
 	protected List<Region> neighbors = new ArrayList<>();
