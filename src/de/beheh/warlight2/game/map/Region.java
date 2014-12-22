@@ -149,7 +149,6 @@ public class Region extends AbstractRegion {
 		if (region == null) {
 			throw new IllegalArgumentException("region cannot be null");
 		}
-		System.err.println("looking for route from " + this + " to " + region);
 		HashMap<Region, Region> parents = new HashMap<>();
 		Queue<Region> searchQueue = new LinkedList<>();
 		searchQueue.add(this);
