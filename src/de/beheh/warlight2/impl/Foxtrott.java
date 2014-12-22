@@ -9,6 +9,7 @@ import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
 import de.beheh.warlight2.stats.Scorer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class Foxtrott extends Bot {
 	public Region pickStartingRegion(Region[] regions) {
 		// choose region with higher static/dynamic rank
 		List<Region> startRegionList = Arrays.asList(regions);
-		startRegionList.sort(new RegionDesirabilityScorer());
+		Collections.sort(startRegionList, new RegionDesirabilityScorer());
 		return regions[0];
 	}
 
@@ -51,7 +52,7 @@ public class Foxtrott extends Bot {
 
 		Map map = gameTracker.getMap();
 		List<Region> ownedRegionsList = map.getRegionsByPlayer(gameTracker.getPlayer());
-		ownedRegionsList.sort(new Scorer<Region>() {
+		Collections.sort(ownedRegionsList, new Scorer<Region>() {
 
 			@Override
 			protected double score(Region region) {
@@ -89,7 +90,7 @@ public class Foxtrott extends Bot {
 		// rank surrounding regions
 		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
 			List<Region> neighbors = region.getNeighbors();
-			neighbors.sort(new RegionAttackTransferDecisionScorer(region));
+			Collections.sort(neighbors, new RegionAttackTransferDecisionScorer(region));
 		}
 		
 		return command;

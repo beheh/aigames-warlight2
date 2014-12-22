@@ -4,6 +4,7 @@ import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.stats.Scorer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -136,7 +137,7 @@ public class Region extends AbstractRegion {
 		isSearching = true;
 		List<Region> sortedNeighbors = new ArrayList<>(neighbors);
 		if (scorer != null) {
-			sortedNeighbors.sort(scorer);
+			Collections.sort(neighbors, scorer);
 		}
 		for (Region neighbor : sortedNeighbors) {
 			Route neighborRoute = neighbor.routeTo(region);
