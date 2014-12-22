@@ -2,6 +2,7 @@ package de.beheh.warlight2.stats;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -18,9 +19,9 @@ public class ScorerTest {
 	@Test
 	public void testScore() {
 		System.out.println("compare");
-		List<Integer> list = new ArrayList<Integer>(Arrays.asList(new Integer[]{2, 3, 1, 4, 5}));
+		List<Integer> list = new ArrayList<>(Arrays.asList(new Integer[]{2, 3, 1, 4, 5}));
 
-		list.sort(new Scorer<Integer>() {
+		Collections.sort(list, new Scorer<Integer>() {
 
 			@Override
 			protected double score(Integer integer) {
@@ -29,7 +30,7 @@ public class ScorerTest {
 		});
 		assertArrayEquals(new Integer[]{5, 4, 3, 2, 1}, list.toArray());
 
-		list.sort(new Scorer<Integer>() {
+		Collections.sort(list, new Scorer<Integer>() {
 
 			@Override
 			protected double score(Integer integer) {
@@ -38,7 +39,7 @@ public class ScorerTest {
 		});
 		assertArrayEquals(new Integer[]{1, 2, 3, 4, 5}, list.toArray());
 
-		list.sort(new Scorer<Integer>() {
+		Collections.sort(list, new Scorer<Integer>() {
 
 			@Override
 			protected double score(Integer integer) {
@@ -56,7 +57,7 @@ public class ScorerTest {
 		System.out.println("group");
 		List<Integer> list = new ArrayList<Integer>(Arrays.asList(new Integer[]{2, 3, 1, 4, 5}));
 
-		list.sort(new Scorer<Integer>() {
+		Collections.sort(list, new Scorer<Integer>() {
 
 			@Override
 			protected int group(Integer integer) {
@@ -70,7 +71,7 @@ public class ScorerTest {
 		});
 		assertArrayEquals(new Integer[]{3, 2, 1, 5, 4}, list.toArray());
 
-		list.sort(new Scorer<Integer>() {
+		Collections.sort(list, new Scorer<Integer>() {
 
 			@Override
 			protected int group(Integer integer) {
