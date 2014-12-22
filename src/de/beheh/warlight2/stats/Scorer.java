@@ -9,7 +9,9 @@ import java.util.Comparator;
  */
 public abstract class Scorer<E> implements Comparator<E> {
 
-	protected abstract double score(E object);
+	protected double score(E object) {
+		return 0;
+	}
 
 	protected int group(E object) {
 		return 1;
