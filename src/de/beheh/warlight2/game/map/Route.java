@@ -50,7 +50,7 @@ public class Route implements Iterable<Region> {
 		route.add(region);
 	}
 
-	public List<Region> getRoute() {
+	public LinkedList<Region> getRoute() {
 		return route;
 	}
 
