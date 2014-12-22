@@ -206,17 +206,17 @@ public class Foxtrott extends Bot {
 			for (Region borderRegion : border) {
 				Route route = region.routeTo(borderRegion, new FriendlyRegionGrouper(gameTracker.getPlayer()));
 				List<Region> routeList = route.getRoute();
+				boolean badRoute = false;
 				for (Region routeRegion : routeList) {
-					boolean badRoute = false;
 					if (!routeRegion.isOwnedBy(gameTracker.getPlayer())) {
 						badRoute = true;
 					}
-					if (badRoute) {
-						continue;
-					}
-					if (bestRoute == null || route.length() > bestRoute.length()) {
-						bestRoute = route;
-					}
+				}
+				if (badRoute) {
+					continue;
+				}
+				if (bestRoute == null || route.length() < bestRoute.length()) {
+					bestRoute = route;
 				}
 			}
 
