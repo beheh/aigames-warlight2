@@ -21,6 +21,13 @@ public class Route implements Iterable<Region> {
 		this.route = route;
 	}
 
+	public Region getFirst() {
+		if (route.isEmpty()) {
+			return null;
+		}
+		return route.getFirst();
+	}
+
 	public Region getLast() {
 		if (route.isEmpty()) {
 			return null;
