@@ -7,13 +7,13 @@ import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
-import de.beheh.warlight2.stats.Ranking;
-import de.beheh.warlight2.stats.RegionRank;
-import de.beheh.warlight2.stats.ReinforcementRank;
-import de.beheh.warlight2.stats.SuperRegionRank;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -226,4 +226,87 @@ public class Quickstep extends Bot {
 
 		return command;
 	}
+
+	protected abstract class Rank {
+
+		public abstract double getScore();
+
+		public int compare(Rank rank) {
+			return Double.compare(getScore(), rank.getScore());
+		}
+	}
+
+	protected class Ranking<E> {
+
+		protected List<E> rankList = null;
+		protected HashMap<E, Rank> map = new HashMap<>();
+
+		public void addObject(E key, Rank rank) {
+			map.put(key, rank);
+			rerank();
+		}
+
+		protected void rerank() {
+			rankList = new LinkedList(map.keySet());
+			Collections.sort(rankList, new Comparator<E>() {
+
+				@Override
+				public int compare(E object1, E object2) {
+					// higher rank score first
+					return map.get(object2).compare(map.get(object1));
+				}
+			});
+		}
+
+		public List<E> getRankList() {
+			return rankList;
+		}
+
+	}
+
+	protected class RegionRank extends Rank {
+
+		protected final Region region;
+
+		public RegionRank(Region region) {
+			this.region = region;
+		}
+
+		@Override
+		public double getScore() {
+			return region.getSuperRegion().getBonus();
+		}
+
+	}
+
+	protected class ReinforcementRank extends Rank {
+
+		private final Region region;
+
+		public ReinforcementRank(Region region) {
+			this.region = region;
+		}
+
+		@Override
+		public double getScore() {
+			return Math.max(region.getPotentialAttackers() - region.getArmyCount(), 0);
+		}
+
+	}
+
+	protected class SuperRegionRank extends Rank {
+
+		protected SuperRegion superRegion;
+
+		public SuperRegionRank(SuperRegion superRegion) {
+			this.superRegion = superRegion;
+		}
+
+		@Override
+		public double getScore() {
+			return (2 * superRegion.getBonus()) - Math.pow(superRegion.getRegionCount(), 2);
+		}
+
+	}
+
 }
