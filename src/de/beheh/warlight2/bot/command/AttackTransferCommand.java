@@ -20,24 +20,27 @@ public class AttackTransferCommand extends Command {
 
 	public void attack(Region from, Region to, int armyCount) {
 		if (from.getOwner() == to.getOwner()) {
-			throw new RuntimeException("attempting to attack own region");
+			throw new RuntimeException("attempting to attack own region (from " + from + " to " + to + ")");
 		}
 		move(from, to, armyCount);
 	}
 
 	public void transfer(Region from, Region to, int armyCount) {
 		if (from.getOwner() != to.getOwner()) {
-			throw new RuntimeException("attempting to transfer to enemy or neutral region");
+			throw new RuntimeException("attempting to transfer to enemy or neutral region (from " + from + " to " + to + ")");
 		}
 		move(from, to, armyCount);
 	}
 
 	public void move(Region from, Region to, int armyCount) {
-		if(from == null || to == null) {
+		if (from == null || to == null) {
 			throw new IllegalArgumentException("from/to can't be null");
 		}
-		if(armyCount < 1) {
-			throw new IllegalArgumentException("invalid armyCount "+armyCount);
+		if (armyCount < 1) {
+			throw new IllegalArgumentException("invalid armyCount " + armyCount);
+		}
+		if (!from.isNeighbor(to)) {
+			throw new IllegalArgumentException("cannot attack/transfer if regions aren't neighbors (from " + from + " to " + to + ")");
 		}
 		movements.add(new Movement(from, to, armyCount));
 	}
