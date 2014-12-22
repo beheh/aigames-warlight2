@@ -20,9 +20,9 @@ import java.util.List;
  *
  * @author Benedict Etzel
  */
-public class Foxtrott extends Bot {
+public class Foxtrot extends Bot {
 
-	public Foxtrott(GameTracker gameTracker) {
+	public Foxtrot(GameTracker gameTracker) {
 		super(gameTracker);
 	}
 
