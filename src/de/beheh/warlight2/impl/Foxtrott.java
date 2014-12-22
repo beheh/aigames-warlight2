@@ -92,7 +92,10 @@ public class Foxtrott extends Bot {
 
 		@Override
 		protected double score(Region region) {
-			return region.getPotentialAttackers();
+			if (region.isNeutral()) {
+				return 0;
+			}
+			return region.getArmyCount() - region.getPotentialAttackers();
 		}
 
 	}
@@ -111,10 +114,12 @@ public class Foxtrott extends Bot {
 			return command;
 		}
 
+		Collections.sort(border, new RegionThreatScorer());
+
 		// @todo spread armies out for multiple fronts
 		for (Region borderNeighbor : border) {
 			List<Region> ourRegions = borderNeighbor.getNeighborsByPlayer(gameTracker.getPlayer());
-			Collections.sort(ourRegions, new RegionThreatScorer());
+			Collections.sort(ourRegions, new RegionDesirabilityScorer());
 			Region targetRegion = ourRegions.get(0);
 			if (remainingArmies > 0) {
 				targetRegion.increaseArmy(remainingArmies);
