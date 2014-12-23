@@ -200,7 +200,7 @@ public class Foxtrot extends Bot {
 		for (Region region : superRegion.getRegions()) {
 			// assume the enemy has taken neutral regions it if we haven't seen them for a while
 			int lastUpdate = 0;
-			if(region.getLastUpdate() != null) {
+			if (region.getLastUpdate() != null) {
 				lastUpdate = region.getLastUpdate();
 			}
 			if (region.isNeutral() && lastUpdate < gameTracker.getRound() - superRegion.getRegionCount()) {
@@ -210,9 +210,6 @@ public class Foxtrot extends Bot {
 				owned = false;
 				break;
 			}
-		}
-		if (owned) {
-			System.err.println("predicting that " + player + " owns SuperRegion " + superRegion);
 		}
 		return owned;
 	}
