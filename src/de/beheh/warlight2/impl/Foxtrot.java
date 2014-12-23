@@ -173,11 +173,10 @@ public class Foxtrot extends Bot {
 		for (Region neighbor : neighbors) {
 			if (neighbor.isHostile(region.getOwner())) {
 				attackers += neighbor.getArmyCount() - 1;
-				hostilePlayer = neighbor.getOwner();
 			}
 		}
 		if (hostilePlayer != null) {
-			attackers += predictPlayerBonus(hostilePlayer);
+			attackers += predictPlayerBonus(gameTracker.getPlayer());
 		}
 		return attackers;
 	}
@@ -289,7 +288,7 @@ public class Foxtrot extends Bot {
 				if (route == null) {
 					continue;
 				}
-				if (bestRoute == null || route.length() < bestRoute.length()) {
+				if (bestRoute == null || route.length() < bestRoute.length() - 1) {
 					bestRoute = route;
 				}
 			}
@@ -316,7 +315,7 @@ public class Foxtrot extends Bot {
 					}
 
 					int requiredDefenders = requiredDefenders(predictAttackers(neighbor)) - neighbor.getScheduledArmyCount();
-					int transferArmies = Math.max(requiredDefenders, region.getArmyCount() - 1);
+					int transferArmies = Math.min(Math.max(requiredDefenders, 0), region.getArmyCount() - 1);
 					if (transferArmies < 1) {
 						continue;
 					}
