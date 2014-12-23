@@ -36,7 +36,7 @@ public class Foxtrot extends Bot {
 				return 1;
 			}
 			// high priority: complete enemy SuperRegions
-			if (superRegion.isOwnedBy(gameTracker.getOpponent())) {
+			if (predictSuperRegionOwned(superRegion, gameTracker.getOpponent())) {
 				return 2;
 			}
 			// @todo: lower priority: any amount of enemies around?
@@ -166,15 +166,56 @@ public class Foxtrot extends Bot {
 		lastAttackTransferRound = gameTracker.getRound();
 	}
 
+	protected int predictAttackers(Region region) {
+		List<Region> neighbors = region.getNeighbors();
+		int attackers = 0;
+		Player hostilePlayer = null;
+		for (Region neighbor : neighbors) {
+			if (neighbor.isHostile(region.getOwner())) {
+				attackers += neighbor.getArmyCount() - 1;
+				hostilePlayer = neighbor.getOwner();
+			}
+		}
+		if (hostilePlayer != null) {
+			attackers += predictPlayerBonus(hostilePlayer);
+		}
+		return attackers;
+	}
+
 	protected int predictPlayerBonus(Player player) {
 		Map map = gameTracker.getMap();
 		int bonus = 5;
 		for (SuperRegion superRegion : map.getSuperRegions()) {
-			if (superRegion.isOwnedBy(player)) {
+			if (predictSuperRegionOwned(superRegion, player)) {
 				bonus += superRegion.getBonus();
 			}
 		}
 		return bonus;
+	}
+
+	protected boolean predictSuperRegionOwned(SuperRegion superRegion, Player player) {
+		if (superRegion.isOwnedBy(player)) {
+			return true;
+		}
+		boolean owned = true;
+		for (Region region : superRegion.getRegions()) {
+			// assume the enemy has taken neutral regions it if we haven't seen them for a while
+			int lastUpdate = 0;
+			if(region.getLastUpdate() != null) {
+				lastUpdate = region.getLastUpdate();
+			}
+			if (region.isNeutral() && lastUpdate < gameTracker.getRound() - superRegion.getRegionCount()) {
+				continue;
+			}
+			if (!region.isOwnedBy(player)) {
+				owned = false;
+				break;
+			}
+		}
+		if (owned) {
+			System.err.println("predicting that " + player + " owns SuperRegion " + superRegion);
+		}
+		return owned;
 	}
 
 	@Override
@@ -198,12 +239,9 @@ public class Foxtrot extends Bot {
 			int totalFreeArmies = 0;
 			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
 			for (Region region : ourRegions) {
-				int potentialAttackers = 0;
+				int potentialAttackers = predictAttackers(region);
 				if (borderRegion.isHostile(gameTracker.getPlayer())) {
-					potentialAttackers = region.getPotentialAttackers() - borderRegion.getArmyCount();
-					potentialAttackers += predictPlayerBonus(borderRegion.getOwner());
-				} else {
-					potentialAttackers = region.getPotentialAttackers();
+					potentialAttackers -= borderRegion.getArmyCount();
 				}
 				int requiredDefenders = requiredDefenders(Math.max(potentialAttackers, 0));
 				int freeArmies = Math.max(region.getArmyCount() - requiredDefenders - 1, 0);
@@ -277,8 +315,8 @@ public class Foxtrot extends Bot {
 						break;
 					}
 
-					int requiredDefenders = requiredDefenders(neighbor.getPotentialAttackers()) - neighbor.getScheduledArmyCount();
-					int transferArmies = Math.max(requiredDefenders, 0);
+					int requiredDefenders = requiredDefenders(predictAttackers(neighbor)) - neighbor.getScheduledArmyCount();
+					int transferArmies = Math.max(requiredDefenders, region.getArmyCount() - 1);
 					if (transferArmies < 1) {
 						continue;
 					}
