@@ -51,6 +51,13 @@ public class MapHandler {
 		}
 	}
 
+	public void setOpponentStartingRegions(int[] regions) {
+		Map map = gameTracker.getMap();
+		for (int region : regions) {
+			map.update(region, gameTracker.getOpponent(), gameTracker.getStartingArmies(), gameTracker.getRound());
+		}
+	}
+
 	public void updateMap(String[] parameters) {
 		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 3) {

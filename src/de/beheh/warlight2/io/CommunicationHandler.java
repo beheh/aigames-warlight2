@@ -90,7 +90,8 @@ public class CommunicationHandler {
 								mapHandler.setWastelands(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							case "opponent_starting_regions":
-								//@todo implement opponent_starting_regions
+								CommunicationHandler.assertLength(parts, 2, 1);
+								mapHandler.setOpponentStartingRegions(CommunicationHandler.castIntegerParameters(parts, 2));
 								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
@@ -152,7 +153,7 @@ public class CommunicationHandler {
 						CommunicationHandler.assertLength(parts, 1, 1);
 						// map changes are already handled by update_map
 						// this is mainly for analyzing the enemies behaviour
-						requestProcessor.opponentMoves();
+						requestProcessor.opponentMoves(); // @todo pass parameters
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -181,9 +182,6 @@ public class CommunicationHandler {
 						break;
 				}
 			} catch (IOException e) {
-				if (false) {
-					throw e;
-				}
 				e.printStackTrace(System.err);
 				System.err.println("line for previous exception was \"" + line + "\"");
 			}

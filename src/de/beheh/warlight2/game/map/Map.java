@@ -132,4 +132,5 @@ public class Map {
 	public Collection<Region> getRegions() {
 		return regions.values();
 	}
+
 }

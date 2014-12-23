@@ -42,16 +42,10 @@ public class Quickstep extends Bot {
 		}
 	}
 
-	List<Region> startingRegions = null;
-
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
 		Region pickRegion = null;
 		Map map = gameTracker.getMap();
-		// save all starting regions for later
-		if (startingRegions == null) {
-			startingRegions = new ArrayList<>(Arrays.asList(regions));
-		}
 		// pick highest ranked region
 		for (SuperRegion superRegion : superRegionRanking.getRankList()) {
 			for (Region region : regions) {
@@ -70,19 +64,6 @@ public class Quickstep extends Bot {
 			pickRegion = regions[rand.nextInt(regions.length)];
 		}
 		return pickRegion;
-	}
-
-	@Override
-	public void onPickingComplete() {
-		// regions we didn't pick went our opponent
-		Iterator<Region> iterator = startingRegions.iterator();
-		while (iterator.hasNext()) {
-			Region startingRegion = iterator.next();
-			if (startingRegion.getOwner() == null || !startingRegion.getOwner().equals(gameTracker.getPlayer())) {
-				startingRegion.setOwner(gameTracker.getOpponent());
-				startingRegion.setLastUpdate(0); // updated at "round 0"
-			}
-		}
 	}
 
 	protected int getRequiredArmies(int armyCount) {
