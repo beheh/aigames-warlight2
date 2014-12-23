@@ -46,10 +46,11 @@ public class Foxtrot extends Bot {
 		@Override
 		public double score(Region region) {
 			SuperRegion superRegion = region.getSuperRegion();
-			double staticScore = superRegion.getBonus() / ((superRegion.getRegionCount() / 2) + superRegion.getWastelandCount() * 5);
+			double staticScore = superRegion.getBonus() / ((superRegion.getRegionCount() / 2) + superRegion.getWastelandCount() * 3);
 			double takeoverScore = 0;
 			if (!region.isOwnedBy(gameTracker.getPlayer())) {
 				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size()) / (superRegion.getWastelandCount() + 1);
+				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getOpponent()).size()) / (superRegion.getWastelandCount() + 1);
 			}
 			return staticScore * 5 + takeoverScore * 1;
 		}
