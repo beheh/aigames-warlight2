@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  *
@@ -248,12 +249,20 @@ public class Foxtrot extends Bot {
 
 			// go for it only if we have a slight advantage
 			if (shouldAttack(totalFreeArmies, borderRegion.getArmyCount())) {
+
 				// prevent overkill
-				int overkill = totalFreeArmies - borderRegion.getArmyCount();
-				for (java.util.Map.Entry<Region, Integer> entry : reservedArmies.entrySet()) {
+				int predictedBonus = 0;
+				if (borderRegion.isHostile(gameTracker.getPlayer())) {
+					predictedBonus += predictPlayerBonus(gameTracker.getOpponent());
+				}
+				float overkill = totalFreeArmies / ((borderRegion.getArmyCount() + predictedBonus) * 1.5f);
+
+				List<Entry<Region, Integer>> reservationList = new ArrayList<>(reservedArmies.entrySet());
+				for (Entry<Region, Integer> entry : reservationList) {
 					Region region = entry.getKey();
-					// lets take about 1.5x the amount the enemy has
-					int attackers = Math.min(Math.round(entry.getValue() * 1.5f) - Math.round(overkill / reservedArmies.size()) + 1, region.getArmyCount() - 1);
+					int reserved = entry.getValue();
+
+					int attackers = Math.min(Math.round(reserved / overkill + 1), region.getArmyCount() - 1);
 					if (attackers > 0) {
 						command.attack(region, borderRegion, attackers);
 						region.decreaseArmy(attackers);
