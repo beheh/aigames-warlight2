@@ -4,6 +4,7 @@ import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.bot.command.NoMovesCommand;
 import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 
@@ -76,7 +77,7 @@ public class CommandProcessor {
 		return commandToString(command);
 	}
 
-	public void opponentMoves() {
+	public void opponentMoves(String[] parameters) {
 		bot.onOpponentMoves();
 	}
 

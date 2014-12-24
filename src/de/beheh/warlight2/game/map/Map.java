@@ -75,6 +75,10 @@ public class Map {
 		return regions.get(id);
 	}
 
+	public Collection<Region> getRegions() {
+		return regions.values();
+	}
+
 	public int getRegionCount() {
 		return regions.size();
 	}
@@ -97,6 +101,18 @@ public class Map {
 			}
 		}
 		return playerRegions;
+	}
+
+	public void verifyRegionLost(int id, Player attacker, int round) {
+		Region region = regions.get(id);
+		if (region.isNeutral() || region.isOwnedBy(attacker)) {
+			return;
+		}
+		if (region.getLastUpdate() == round) {
+			return;
+		}
+		System.err.println("Map: lost region " + region + " on round #" + round + " (expected an update, was last updated " + region.getLastUpdate() + ")");
+		region.setOwner(attacker);
 	}
 
 	@Override
@@ -128,9 +144,4 @@ public class Map {
 		builder.append(")");
 		return builder.toString();
 	}
-
-	public Collection<Region> getRegions() {
-		return regions.values();
-	}
-
 }

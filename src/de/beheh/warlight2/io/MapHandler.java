@@ -3,7 +3,10 @@ package de.beheh.warlight2.io;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
+import de.beheh.warlight2.game.map.Region;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -58,13 +61,43 @@ public class MapHandler {
 		}
 	}
 
+	List<Integer> expectedRegionUpdates = new LinkedList<>();
+
+	protected void expectRegionUpdate(int region) {
+		expectedRegionUpdates.add(region);
+	}
+
 	public void updateMap(String[] parameters) {
 		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 3) {
 			int region = Integer.valueOf(parameters[i]);
 			Player owner = gameTracker.getPlayer(parameters[i + 1]);
 			int armies = Integer.valueOf(parameters[i + 2]);
+			expectedRegionUpdates.remove((Integer) region); // does not matter if it isn't expected
 			map.update(region, owner, armies, gameTracker.getRound());
+		}
+		// probably lost control over any non-updated regions
+		for (int region : expectedRegionUpdates) {
+			map.verifyRegionLost(region, gameTracker.getOpponent(), gameTracker.getRound());
+		}
+	}
+
+	public void opponentMoves(String[] parameters) {
+		Map map = gameTracker.getMap();
+		for (int i = 0; i < parameters.length; i += 4) {
+			Player owner = gameTracker.getPlayer(parameters[i]);
+			String command = parameters[i + 1];
+			int from = Integer.valueOf(parameters[i + 2]);
+			int to = Integer.valueOf(parameters[i + 3]);
+			switch (command) {
+				case "attack/transfer":
+					int armyCount = Integer.valueOf(parameters[i + 4]);
+					expectRegionUpdate(to);
+					i++; // attack/transfer are longer by one parameter
+					break;
+				default:
+					break;
+			}
 		}
 	}
 

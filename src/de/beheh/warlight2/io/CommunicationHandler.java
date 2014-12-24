@@ -151,9 +151,9 @@ public class CommunicationHandler {
 						break;
 					case "opponent_moves":
 						CommunicationHandler.assertLength(parts, 1, 1);
-						// map changes are already handled by update_map
-						// this is mainly for analyzing the enemies behaviour
-						requestProcessor.opponentMoves(); // @todo pass parameters
+						// map changes are handled by update map
+						mapHandler.opponentMoves(Arrays.copyOfRange(parts, 1, parts.length)); // check for lost regions
+						requestProcessor.opponentMoves(Arrays.copyOfRange(parts, 1, parts.length)); // notify bot
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -181,7 +181,7 @@ public class CommunicationHandler {
 						CommunicationHandler.unknownCommand(parts[0]);
 						break;
 				}
-			} catch (IOException e) {
+			} catch (IOException | RuntimeException e) {
 				e.printStackTrace(System.err);
 				System.err.println("line for previous exception was \"" + line + "\"");
 			}

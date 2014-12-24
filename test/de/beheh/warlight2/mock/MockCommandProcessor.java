@@ -28,8 +28,7 @@ public class MockCommandProcessor extends CommandProcessor {
 	}
 
 	@Override
-	public void opponentMoves() {
-
+	public void opponentMoves(String[] parameters) {
 	}
 
 	@Override
