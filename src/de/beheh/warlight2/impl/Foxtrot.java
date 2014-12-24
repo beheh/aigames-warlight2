@@ -233,13 +233,19 @@ public class Foxtrot extends Bot {
 			Collections.sort(ourRegions, new RegionDesirabilityScorer());
 			Collections.reverse(ourRegions);
 
+			// worst case: reinforcements exactly where we try to attack
+			int expectedDefenders = borderRegion.getArmyCount();
+			if (borderRegion.isHostile(gameTracker.getPlayer())) {
+				expectedDefenders += predictPlayerBonus(gameTracker.getOpponent());
+			}
+
 			// count our armies
 			int totalFreeArmies = 0;
 			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
 			for (Region region : ourRegions) {
 				int potentialAttackers = predictAttackers(region);
 				if (borderRegion.isHostile(gameTracker.getPlayer())) {
-					potentialAttackers -= borderRegion.getArmyCount();
+					potentialAttackers -= expectedDefenders;
 				}
 				int requiredDefenders = requiredDefenders(Math.max(potentialAttackers, 0));
 				int freeArmies = Math.max(region.getArmyCount() - requiredDefenders - 1, 0);
@@ -248,14 +254,10 @@ public class Foxtrot extends Bot {
 			}
 
 			// go for it only if we have a slight advantage
-			if (shouldAttack(totalFreeArmies, borderRegion.getArmyCount())) {
+			if (shouldAttack(totalFreeArmies, expectedDefenders)) {
 
 				// prevent overkill
-				int predictedBonus = 0;
-				if (borderRegion.isHostile(gameTracker.getPlayer())) {
-					predictedBonus += predictPlayerBonus(gameTracker.getOpponent());
-				}
-				float overkill = totalFreeArmies / ((borderRegion.getArmyCount() + predictedBonus) * 1.5f);
+				float overkill = totalFreeArmies / (expectedDefenders * 1.5f);
 
 				List<Entry<Region, Integer>> reservationList = new ArrayList<>(reservedArmies.entrySet());
 				for (Entry<Region, Integer> entry : reservationList) {
