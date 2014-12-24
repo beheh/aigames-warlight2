@@ -336,7 +336,7 @@ public class Foxtrot extends Bot {
 				Region target = bestRoute.getFirst();
 				command.transfer(region, target, freeArmies);
 				region.decreaseArmy(freeArmies);
-				target.increaseArmy(freeArmies);
+				target.scheduleIncreaseArmy(freeArmies);
 				updateLastAttackTransferRound();
 			} else {
 				System.err.println("error: cannot reach any border from " + region);
@@ -344,5 +344,13 @@ public class Foxtrot extends Bot {
 		}
 
 		return command;
+	}
+
+	@Override
+	public void onRoundComplete() {
+		Map map = gameTracker.getMap();
+		for(Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+			region.commitSchedule();
+		}
 	}
 }
