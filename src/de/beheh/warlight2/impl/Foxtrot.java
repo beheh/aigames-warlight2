@@ -36,12 +36,7 @@ public class Foxtrot extends Bot {
 			if (superRegion.isOwnedBy(gameTracker.getPlayer())) {
 				return 1;
 			}
-			// high priority: complete enemy SuperRegions
-			if (predictSuperRegionOwned(superRegion, gameTracker.getOpponent())) {
-				return 2;
-			}
-			// @todo: lower priority: any amount of enemies around?
-			return 3;
+			return 2;
 		}
 
 		@Override
@@ -51,7 +46,7 @@ public class Foxtrot extends Bot {
 			double takeoverScore = 0;
 			if (!region.isOwnedBy(gameTracker.getPlayer())) {
 				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size()) / (superRegion.getWastelandCount() + 1);
-				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getOpponent()).size()) / (superRegion.getWastelandCount() + 1);
+				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getOpponent()).size()) / (superRegion.getWastelandCount() + 1) * 2 / 3;
 			}
 			return staticScore * 5 + takeoverScore * 1;
 		}
