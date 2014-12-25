@@ -52,7 +52,7 @@ public class RouteTest {
 		assertEquals(1, instance.length());
 		instance.add(region2);
 		assertEquals(2, instance.length());
-		instance.addBefore(region3);
+		instance.addFirst(region3);
 		assertEquals(3, instance.length());
 	}
 
@@ -68,7 +68,7 @@ public class RouteTest {
 		Region region2 = new Region(1, new MockSuperRegion());
 		Route route = new Route();
 		route.add(region2);
-		route.addBefore(region1);
+		route.addFirst(region1);
 		assertThat(route, is(new Route(new LinkedList<Region>(Arrays.asList(new Region[]{region1, region2})))));
 		route = new Route();
 	}
