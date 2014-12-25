@@ -54,7 +54,7 @@ public class Map {
 				sum += count;
 			}
 			neighborCount = ((double) sum) / ((double) neighborCounts.size());
-			System.err.println("average neighbor count is " + neighborCount);
+			System.err.println(getClass().getSimpleName() + ": average neighbor count is " + neighborCount);
 		}
 		return neighborCount;
 	}
@@ -111,7 +111,7 @@ public class Map {
 		if (region.getLastUpdate() == round) {
 			return;
 		}
-		System.err.println("Map: lost region " + region + " during round #" + round + " (expected an update, was last updated " + region.getLastUpdate() + ")");
+		System.err.println(getClass().getSimpleName() + ": lost region " + region + " during round #" + round + " (expected an update, was last updated " + region.getLastUpdate() + ")");
 		region.setOwner(attacker);
 	}
 

@@ -3,6 +3,7 @@ package de.beheh.warlight2;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.game.GameTracker;
 import de.beheh.warlight2.impl.Foxtrot;
+import de.beheh.warlight2.impl.Jive;
 import de.beheh.warlight2.impl.Quickstep;
 import de.beheh.warlight2.io.CommunicationHandler;
 import de.beheh.warlight2.io.MapHandler;
@@ -20,7 +21,7 @@ public class Launcher {
 	public static void main(String[] args) {
 		try {
 			GameTracker gameTracker = new GameTracker();
-			Bot bot = new Foxtrot(gameTracker);
+			Bot bot = new Jive(gameTracker);
 			MapHandler mapHandler = new MapHandler(gameTracker);
 			CommandProcessor requestProcessor = new CommandProcessor(gameTracker, bot);
 			CommunicationHandler communicationHandler = new CommunicationHandler(System.in, System.out, mapHandler, gameTracker, requestProcessor);

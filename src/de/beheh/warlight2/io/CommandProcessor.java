@@ -4,7 +4,6 @@ import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.bot.command.NoMovesCommand;
 import de.beheh.warlight2.game.GameTracker;
-import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 
@@ -42,13 +41,15 @@ public class CommandProcessor {
 		}
 		try {
 			Region region = bot.pickStartingRegion(regions);
-			System.err.println("pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
-			return region.toString();
+			System.err.println(getClass().getSimpleName() + ": pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			if (region != null) {
+				return region.toString();
+			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
-			System.err.println("defaulting to region " + regionIds[0]);
-			return Integer.toString(regionIds[0]);
 		}
+		System.err.println(getClass().getSimpleName() + ": no region picked, defaulting to region " + regionIds[0]);
+		return Integer.toString(regionIds[0]);
 	}
 
 	public String placeArmies(Long time) {
@@ -57,7 +58,7 @@ public class CommandProcessor {
 		Command command = null;
 		try {
 			command = bot.placeArmies(gameTracker.getStartingArmies());
-			System.err.println("Round #" + gameTracker.getRound() + ": placeArmies took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			System.err.println(getClass().getSimpleName() + ": placeArmies in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -70,7 +71,7 @@ public class CommandProcessor {
 		Command command = null;
 		try {
 			command = bot.attackTransfer();
-			System.err.println("Round #" + gameTracker.getRound() + ": attackTransfer took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			System.err.println(getClass().getSimpleName() + ": attackTransfer in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

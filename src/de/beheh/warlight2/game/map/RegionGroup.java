@@ -1,5 +1,6 @@
 package de.beheh.warlight2.game.map;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,6 +53,11 @@ public class RegionGroup implements Iterable<Region> {
 
 	public final int size() {
 		return regions.size();
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.toString(regions.toArray());
 	}
 
 }
