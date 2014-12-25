@@ -147,8 +147,8 @@ public class Foxtrot extends Bot {
 	}
 
 	protected boolean shouldAttack(int attackers, int defenders) {
-		float factor = 0.8f;
-		factor += Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * 0.1f;
+		float factor = 0.7f;
+		factor += Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * (0.3f / 5);
 		return Math.round(attackers * factor) > defenders;
 	}
 
