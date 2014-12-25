@@ -111,7 +111,7 @@ public class Map {
 		if (region.getLastUpdate() == round) {
 			return;
 		}
-		System.err.println("Map: lost region " + region + " on round #" + round + " (expected an update, was last updated " + region.getLastUpdate() + ")");
+		System.err.println("Map: lost region " + region + " during round #" + round + " (expected an update, was last updated " + region.getLastUpdate() + ")");
 		region.setOwner(attacker);
 	}
 

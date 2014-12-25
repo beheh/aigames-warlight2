@@ -180,32 +180,6 @@ public class Region extends AbstractRegion {
 		}
 
 		return null;
-
-		/*
-		 if (isSearching) {
-		 return null;
-		 }
-
-		 Route bestRoute = null;
-		 isSearching = true;
-		 List<Region> sortedNeighbors = new ArrayList<>(neighbors);
-		 if (scorer != null) {
-		 Collections.sort(neighbors, scorer);
-		 }
-		 for (Region neighbor : sortedNeighbors) {
-		 Route neighborRoute = neighbor.routeTo(region);
-		 if (neighborRoute == null) {
-		 continue;
-		 }
-		 neighborRoute.addBefore(region);
-		 //System.out.println("from " + neighbor + " to " + region + ": got route length " + neighborRoute.length());
-		 if (bestRoute == null || neighborRoute.length() < bestRoute.length()) {
-		 bestRoute = neighborRoute;
-		 }
-		 }
-		 isSearching = false;
-		 //System.out.println(Arrays.toString(route.getRoute().toArray()));
-		 return bestRoute;*/
 	}
 
 	public int distanceTo(Region region) {
