@@ -33,6 +33,9 @@ public class PlaceArmiesCommand extends Command {
 
 	@Override
 	public String toString() {
+		if(deployments.isEmpty()) {
+			return null;
+		}
 		StringBuilder stringBuilder = new StringBuilder();
 		Iterator<Entry<Region, Integer>> iterator = deployments.entrySet().iterator();
 		boolean first = true;
