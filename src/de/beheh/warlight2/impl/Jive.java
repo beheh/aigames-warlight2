@@ -73,18 +73,29 @@ public class Jive extends Bot {
 
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
+		// first, pick an easy bonus region with a high distance to other possibilites
+
 		return null;
 	}
 
 	@Override
 	public PlaceArmiesCommand placeArmies(int armyCount) {
-		return null;
+		PlaceArmiesCommand command = new PlaceArmiesCommand(gameState);
+
+		return command;
 	}
 
 	@Override
 	public AttackTransferCommand attackTransfer() {
+		AttackTransferCommand command = new AttackTransferCommand(gameState);
 
-		return null;
+		Map map = gameState.getMap();
+
+		// if worst case is favorable -> attack
+		for (Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
+
+		}
+		return command;
 	}
 
 	// determine maximum amount of troops needed per border segment
@@ -145,6 +156,7 @@ public class Jive extends Bot {
 				builder.append(", ");
 			}
 			builder.append(border);
+			builder.append(" (encloses " + border.getEnclosedRegions().size() + " regions)");
 		}
 		System.err.println(getClass().getSimpleName() + ": detected " + borderGroups.size() + " border group(s): " + builder.toString());
 	}
