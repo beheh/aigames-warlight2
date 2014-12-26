@@ -13,6 +13,7 @@ import de.beheh.warlight2.stats.Scorer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -239,6 +240,7 @@ public class Foxtrot extends Bot {
 			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
 			for (Region region : ourRegions) {
 				int potentialAttackers = predictAttackers(region);
+				// if we attack into a hostile region, the destroyed armies won't attack our region next turn
 				if (borderRegion.isHostile(gameState.getPlayer())) {
 					potentialAttackers -= expectedDefenders;
 				}
@@ -251,19 +253,25 @@ public class Foxtrot extends Bot {
 			// go for it only if we have a slight advantage
 			if (shouldAttack(totalFreeArmies, expectedDefenders)) {
 
-				// prevent overkill
-				float overkill = totalFreeArmies / (expectedDefenders * 1.5f);
-
 				List<Entry<Region, Integer>> reservationList = new ArrayList<>(reservedArmies.entrySet());
+
+				// start with biggest armies first
+				Collections.sort(reservationList, new Comparator<Entry<Region, Integer>>() {
+
+					@Override
+					public int compare(Entry<Region, Integer> entry1, Entry<Region, Integer> entry2) {
+						return Integer.compare(entry2.getValue(), entry1.getValue());
+					}
+				});
+
 				for (Entry<Region, Integer> entry : reservationList) {
 					Region region = entry.getKey();
 					int reserved = entry.getValue();
 
-					int attackers = Math.min(Math.round(reserved / overkill + 1), region.getArmyCount() - 1);
+					int attackers = Math.min(reserved, region.getArmyCount() - 1);
 					if (attackers > 0) {
 						command.attack(region, borderRegion, attackers);
 						region.decreaseArmy(attackers);
-						borderRegion.decreaseArmy(attackers);
 						updateLastAttackTransferRound();
 					}
 				}
@@ -349,7 +357,7 @@ public class Foxtrot extends Bot {
 	@Override
 	public void onRoundComplete() {
 		Map map = gameState.getMap();
-		for(Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
+		for (Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
 			region.commitSchedule();
 		}
 	}
