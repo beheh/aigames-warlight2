@@ -67,6 +67,10 @@ public class Region extends AbstractRegion {
 		return playerNeighbors;
 	}
 
+	public int getNeighborCount() {
+		return neighbors.size();
+	}
+
 	public boolean isNeighbor(Region neighbor) {
 		return neighbors.contains(neighbor);
 	}

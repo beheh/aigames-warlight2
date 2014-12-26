@@ -1,6 +1,6 @@
 package de.beheh.warlight2.bot.command;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.map.Region;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +12,7 @@ import java.util.Map.Entry;
  */
 public class PlaceArmiesCommand extends Command {
 
-	public PlaceArmiesCommand(GameTracker gameTracker) {
+	public PlaceArmiesCommand(GameState gameTracker) {
 		super(gameTracker);
 	}
 

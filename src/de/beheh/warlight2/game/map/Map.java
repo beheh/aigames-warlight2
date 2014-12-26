@@ -1,6 +1,7 @@
 package de.beheh.warlight2.game.map;
 
 import de.beheh.warlight2.game.Player;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,10 +12,20 @@ import java.util.List;
  *
  * @author Benedict Etzel
  */
-public class Map {
+public class Map implements Cloneable, Serializable {
 
-	protected HashMap<Integer, SuperRegion> superRegions = new HashMap<>();
-	protected HashMap<Integer, Region> regions = new HashMap<>();
+	protected final HashMap<Integer, SuperRegion> superRegions;
+	protected final HashMap<Integer, Region> regions;
+
+	public Map() {
+		this.superRegions = new HashMap<>();
+		this.regions = new HashMap<>();
+	}
+
+	public Map(HashMap<Integer, SuperRegion> superRegions, HashMap<Integer, Region> regions) {
+		this.superRegions = superRegions;
+		this.regions = regions;
+	}
 
 	public SuperRegion addSuperRegion(int id, int bonus) {
 		SuperRegion superRegion = new SuperRegion(id, bonus);
@@ -30,8 +41,6 @@ public class Map {
 		return region;
 	}
 
-	List<Integer> neighborCounts = new ArrayList<>();
-
 	public void addNeighbors(int id, int[] neighbors) {
 		Region region = regions.get(id);
 		for (int neighbor : neighbors) {
@@ -39,24 +48,6 @@ public class Map {
 			region.addNeighbor(linked);
 			linked.addNeighbor(region);
 		}
-		neighborCounts.add(neighbors.length);
-	}
-
-	Double neighborCount = null;
-
-	public double getAverageNeighborCount() {
-		if (neighborCount == null) {
-			if (neighborCounts.size() < 1) {
-				return 0;
-			}
-			int sum = 0;
-			for (int count : neighborCounts) {
-				sum += count;
-			}
-			neighborCount = ((double) sum) / ((double) neighborCounts.size());
-			System.err.println(getClass().getSimpleName() + ": average neighbor count is " + neighborCount);
-		}
-		return neighborCount;
 	}
 
 	public void setRegionAsWasteland(int id) {
@@ -143,5 +134,11 @@ public class Map {
 		}
 		builder.append(")");
 		return builder.toString();
+	}
+
+	@Override
+	public Object clone() {
+		Map clone = new Map((HashMap<Integer, SuperRegion>) superRegions.clone(), (HashMap<Integer, Region>) regions.clone());
+		return clone;
 	}
 }

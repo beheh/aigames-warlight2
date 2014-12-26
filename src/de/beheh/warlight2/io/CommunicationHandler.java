@@ -1,6 +1,6 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.bot.command.Command;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +19,10 @@ public class CommunicationHandler {
 	private final Scanner scanner;
 	private final PrintWriter writer;
 	private final MapHandler mapHandler;
-	private final GameTracker gameTracker;
+	private final GameState gameTracker;
 	private final CommandProcessor requestProcessor;
 
-	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameTracker gameTracker, CommandProcessor requestProcessor) {
+	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameState gameTracker, CommandProcessor requestProcessor) {
 		this.scanner = new Scanner(input);
 		this.writer = new PrintWriter(output);
 		this.mapHandler = mapHandler;

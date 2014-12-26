@@ -1,6 +1,6 @@
 package de.beheh.warlight2.bot.command;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Region;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class AttackTransferCommand extends Command {
 
-	public AttackTransferCommand(GameTracker gameTracker) {
+	public AttackTransferCommand(GameState gameTracker) {
 		super(gameTracker);
 	}
 

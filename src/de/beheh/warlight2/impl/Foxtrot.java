@@ -3,7 +3,7 @@ package de.beheh.warlight2.impl;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.AttackTransferCommand;
 import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
@@ -23,7 +23,7 @@ import java.util.Map.Entry;
  */
 public class Foxtrot extends Bot {
 
-	public Foxtrot(GameTracker gameTracker) {
+	public Foxtrot(GameState gameTracker) {
 		super(gameTracker);
 	}
 
@@ -33,7 +33,7 @@ public class Foxtrot extends Bot {
 		protected int group(Region region) {
 			// highest priority: complete SuperRegions
 			SuperRegion superRegion = region.getSuperRegion();
-			if (superRegion.isOwnedBy(gameTracker.getPlayer())) {
+			if (superRegion.isOwnedBy(gameState.getPlayer())) {
 				return 1;
 			}
 			return 2;
@@ -44,9 +44,9 @@ public class Foxtrot extends Bot {
 			SuperRegion superRegion = region.getSuperRegion();
 			double staticScore = superRegion.getBonus() / ((superRegion.getRegionCount() / 2) + superRegion.getWastelandCount() * 3);
 			double takeoverScore = 0;
-			if (!region.isOwnedBy(gameTracker.getPlayer())) {
-				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getPlayer()).size()) / (superRegion.getWastelandCount() + 1);
-				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameTracker.getOpponent()).size()) / (superRegion.getWastelandCount() + 1) * 2 / 3;
+			if (!region.isOwnedBy(gameState.getPlayer())) {
+				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameState.getPlayer()).size()) / (superRegion.getWastelandCount() + 1);
+				takeoverScore += superRegion.getBonus() * (superRegion.getRegionCount() - superRegion.getMissingRegions(gameState.getOpponent()).size()) / (superRegion.getWastelandCount() + 1) * 2 / 3;
 			}
 			return staticScore * 5 + takeoverScore * 1;
 		}
@@ -68,15 +68,15 @@ public class Foxtrot extends Bot {
 	protected List<Region> border = new ArrayList<>();
 
 	public void updateBorder() {
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 
 		border = new ArrayList<>(map.getRegionCount());
-		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+		for (Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
 			for (Region neighbor : region.getNeighbors()) {
 				if (border.contains(neighbor)) {
 					continue;
 				}
-				if (neighbor.isOwnedBy(gameTracker.getPlayer())) {
+				if (neighbor.isOwnedBy(gameState.getPlayer())) {
 					continue;
 				}
 				border.add(neighbor);
@@ -99,11 +99,11 @@ public class Foxtrot extends Bot {
 
 	@Override
 	public PlaceArmiesCommand placeArmies(int remainingArmies) {
-		PlaceArmiesCommand command = new PlaceArmiesCommand(gameTracker);
+		PlaceArmiesCommand command = new PlaceArmiesCommand(gameState);
 
 		updateBorder();
 
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 
 		// the border really should not be empty
 		if (border.isEmpty()) {
@@ -115,7 +115,7 @@ public class Foxtrot extends Bot {
 
 		// @todo spread armies out for multiple fronts
 		for (Region borderNeighbor : border) {
-			List<Region> ourRegions = borderNeighbor.getNeighborsByPlayer(gameTracker.getPlayer());
+			List<Region> ourRegions = borderNeighbor.getNeighborsByPlayer(gameState.getPlayer());
 			Collections.sort(ourRegions, new RegionDesirabilityScorer());
 			Region targetRegion = ourRegions.get(0);
 			if (remainingArmies > 0) {
@@ -148,19 +148,19 @@ public class Foxtrot extends Bot {
 
 	protected boolean shouldAttack(int attackers, int defenders) {
 		float factor = 0.7f;
-		factor += Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * (0.3f / 5);
+		factor += Math.min(gameState.getRound() - lastAttackTransferRound, 5) * (0.3f / 5);
 		return Math.round(attackers * factor) > defenders;
 	}
 
 	protected int requiredDefenders(int potentialAttackers) {
-		float factor = Math.min(gameTracker.getRound() - lastAttackTransferRound, 5) * 0.1f;
+		float factor = Math.min(gameState.getRound() - lastAttackTransferRound, 5) * 0.1f;
 		return Math.round((1.5f - factor) * potentialAttackers);
 	}
 
 	protected int lastAttackTransferRound = 0;
 
 	protected void updateLastAttackTransferRound() {
-		lastAttackTransferRound = gameTracker.getRound();
+		lastAttackTransferRound = gameState.getRound();
 	}
 
 	protected int predictAttackers(Region region) {
@@ -173,13 +173,13 @@ public class Foxtrot extends Bot {
 			}
 		}
 		if (hostilePlayer != null) {
-			attackers += predictPlayerBonus(gameTracker.getPlayer());
+			attackers += predictPlayerBonus(gameState.getPlayer());
 		}
 		return attackers;
 	}
 
 	protected int predictPlayerBonus(Player player) {
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 		int bonus = 5;
 		for (SuperRegion superRegion : map.getSuperRegions()) {
 			if (predictSuperRegionOwned(superRegion, player)) {
@@ -200,7 +200,7 @@ public class Foxtrot extends Bot {
 			if (region.getLastUpdate() != null) {
 				lastUpdate = region.getLastUpdate();
 			}
-			if (region.isNeutral() && lastUpdate < gameTracker.getRound() - superRegion.getRegionCount()) {
+			if (region.isNeutral() && lastUpdate < gameState.getRound() - superRegion.getRegionCount()) {
 				continue;
 			}
 			if (!region.isOwnedBy(player)) {
@@ -213,16 +213,16 @@ public class Foxtrot extends Bot {
 
 	@Override
 	public AttackTransferCommand attackTransfer() {
-		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
+		AttackTransferCommand command = new AttackTransferCommand(gameState);
 
 		updateBorder();
 
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 
 		for (Region borderRegion : border) {
 
 			// border regions "pull" our border armies towards them
-			List<Region> ourRegions = borderRegion.getNeighborsByPlayer(gameTracker.getPlayer());
+			List<Region> ourRegions = borderRegion.getNeighborsByPlayer(gameState.getPlayer());
 
 			// prefer to take from lesser threatened regions
 			Collections.sort(ourRegions, new RegionDesirabilityScorer());
@@ -230,8 +230,8 @@ public class Foxtrot extends Bot {
 
 			// worst case: reinforcements exactly where we try to attack
 			int expectedDefenders = borderRegion.getArmyCount();
-			if (borderRegion.isHostile(gameTracker.getPlayer())) {
-				expectedDefenders += predictPlayerBonus(gameTracker.getOpponent());
+			if (borderRegion.isHostile(gameState.getPlayer())) {
+				expectedDefenders += predictPlayerBonus(gameState.getOpponent());
 			}
 
 			// count our armies
@@ -239,7 +239,7 @@ public class Foxtrot extends Bot {
 			HashMap<Region, Integer> reservedArmies = new HashMap<>(ourRegions.size());
 			for (Region region : ourRegions) {
 				int potentialAttackers = predictAttackers(region);
-				if (borderRegion.isHostile(gameTracker.getPlayer())) {
+				if (borderRegion.isHostile(gameState.getPlayer())) {
 					potentialAttackers -= expectedDefenders;
 				}
 				int requiredDefenders = requiredDefenders(Math.max(potentialAttackers, 0));
@@ -270,7 +270,7 @@ public class Foxtrot extends Bot {
 			}
 		}
 
-		for (Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+		for (Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
 			int freeArmies = region.getArmyCount() - 1; // can use all but one army
 
 			// move remaining armies towards border
@@ -288,7 +288,7 @@ public class Foxtrot extends Bot {
 					alreadyAtBorder = true;
 					break;
 				}
-				Route route = region.routeTo(borderRegion, gameTracker.getPlayer());
+				Route route = region.routeTo(borderRegion, gameState.getPlayer());
 				if (route == null) {
 					continue;
 				}
@@ -300,7 +300,7 @@ public class Foxtrot extends Bot {
 			if (alreadyAtBorder) {
 
 				// check if neighboring regions need support
-				List<Region> neighbors = region.getNeighborsByPlayer(gameTracker.getPlayer());
+				List<Region> neighbors = region.getNeighborsByPlayer(gameState.getPlayer());
 				if (neighbors.isEmpty()) {
 					continue;
 				}
@@ -348,8 +348,8 @@ public class Foxtrot extends Bot {
 
 	@Override
 	public void onRoundComplete() {
-		Map map = gameTracker.getMap();
-		for(Region region : map.getRegionsByPlayer(gameTracker.getPlayer())) {
+		Map map = gameState.getMap();
+		for(Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
 			region.commitSchedule();
 		}
 	}

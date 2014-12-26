@@ -1,6 +1,6 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.mock.MockCommandProcessor;
 import java.io.ByteArrayInputStream;
@@ -65,7 +65,7 @@ public class CommunicationHandlerTest {
 	@Test
 	public void testRun() throws IOException {
 		System.out.println("run");
-		GameTracker gameTracker = new GameTracker();
+		GameState gameTracker = new GameState();
 		MockCommandProcessor requestProcessor = new MockCommandProcessor();
 		byte[] input = ("settings timebank 10000\n"
 				+ "settings time_per_move 500\n"

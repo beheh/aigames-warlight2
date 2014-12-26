@@ -1,10 +1,12 @@
 package de.beheh.warlight2.game;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Benedict Etzel
  */
-public class Player {
+public class Player implements Serializable, Cloneable {
 
 	protected String name;
 
@@ -41,4 +43,11 @@ public class Player {
 	public int hashCode() {
 		return getName().hashCode();
 	}
+
+	@Override
+	public Object clone() {
+		Player clone = new Player(name);
+		return clone;
+	}
+
 }

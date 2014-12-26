@@ -3,7 +3,7 @@ package de.beheh.warlight2.impl;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.AttackTransferCommand;
 import de.beheh.warlight2.bot.command.PlaceArmiesCommand;
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class Quickstep extends Bot {
 
-	public Quickstep(GameTracker gameTracker) {
+	public Quickstep(GameState gameTracker) {
 		super(gameTracker);
 	}
 
@@ -31,7 +31,7 @@ public class Quickstep extends Bot {
 
 	@Override
 	public void onMapComplete() {
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 		System.err.println(map.toString());
 		// calculate base value for all superregions
 		for (SuperRegion superRegion : map.getSuperRegions()) {
@@ -42,7 +42,7 @@ public class Quickstep extends Bot {
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
 		Region pickRegion = null;
-		Map map = gameTracker.getMap();
+		Map map = gameState.getMap();
 		// pick highest ranked region
 		for (SuperRegion superRegion : superRegionRanking.getRankList()) {
 			for (Region region : regions) {
@@ -69,12 +69,12 @@ public class Quickstep extends Bot {
 
 	@Override
 	public PlaceArmiesCommand placeArmies(int armyCount) {
-		Map map = gameTracker.getMap();
-		PlaceArmiesCommand command = new PlaceArmiesCommand(gameTracker);
+		Map map = gameState.getMap();
+		PlaceArmiesCommand command = new PlaceArmiesCommand(gameState);
 
 		// pick a random owned region
 		Ranking<Region> regionRanking = new Ranking<>();
-		List<Region> ownRegions = map.getRegionsByPlayer(gameTracker.getPlayer());
+		List<Region> ownRegions = map.getRegionsByPlayer(gameState.getPlayer());
 		for (Region region : ownRegions) {
 			regionRanking.addObject(region, new ReinforcementRank(region));
 		}
@@ -103,13 +103,13 @@ public class Quickstep extends Bot {
 
 	@Override
 	public AttackTransferCommand attackTransfer() {
-		Map map = gameTracker.getMap();
-		AttackTransferCommand command = new AttackTransferCommand(gameTracker);
+		Map map = gameState.getMap();
+		AttackTransferCommand command = new AttackTransferCommand(gameState);
 
 		try {
 			// find secure areas to move away from
 
-			List<Region> ownRegions = map.getRegionsByPlayer(gameTracker.getPlayer());
+			List<Region> ownRegions = map.getRegionsByPlayer(gameState.getPlayer());
 
 			for (Region region : ownRegions) {
 				// can attack/transfer all but the last one
@@ -133,7 +133,7 @@ public class Quickstep extends Bot {
 
 				// can we attack something with the rest?
 				for (Region neighbor : neighborRankList) {
-					if (gameTracker.getOpponent().equals(neighbor.getOwner())) {
+					if (gameState.getOpponent().equals(neighbor.getOwner())) {
 						int requiredArmies = getRequiredArmies(neighbor.getArmyCount());
 						// force attack if we really have enough
 						if (neighbor.getPotentialAttackers() > 3 * freeArmies) {
@@ -174,11 +174,11 @@ public class Quickstep extends Bot {
 
 				// nothing worth attacking or defending for some armies, so move to best region
 				Region target = region;
-				int targetEnemyDistance = region.playerDistance(gameTracker.getOpponent(), 4);
+				int targetEnemyDistance = region.playerDistance(gameState.getOpponent(), 4);
 				for (Region neighbor : region.getNeighbors()) {
 					if (region.getOwner() == neighbor.getOwner()) {
 						// awesome! lets go there
-						int neighborDistance = neighbor.playerDistance(gameTracker.getOpponent(), 4);
+						int neighborDistance = neighbor.playerDistance(gameState.getOpponent(), 4);
 						if (neighbor.getPotentialAttackers() > target.getPotentialAttackers() || (neighborDistance != -1 && (targetEnemyDistance == -1 || neighborDistance < targetEnemyDistance))) {
 							target = neighbor;
 							targetEnemyDistance = neighborDistance;

@@ -1,6 +1,6 @@
 package de.beheh.warlight2.io;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.Player;
 import de.beheh.warlight2.game.map.Map;
 import java.util.LinkedList;
@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class MapHandler {
 
-	protected GameTracker gameTracker;
+	protected GameState gameTracker;
 
-	public MapHandler(GameTracker gameTracker) {
+	public MapHandler(GameState gameTracker) {
 		this.gameTracker = gameTracker;
 	}
 

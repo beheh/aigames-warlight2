@@ -1,6 +1,6 @@
 package de.beheh.warlight2.bot.command;
 
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 
 /**
  *
@@ -8,9 +8,9 @@ import de.beheh.warlight2.game.GameTracker;
  */
 public abstract class Command {
 
-	protected GameTracker gameTracker;
+	protected GameState gameTracker;
 
-	public Command(GameTracker gameTracker) {
+	public Command(GameState gameTracker) {
 		this.gameTracker = gameTracker;
 	}
 

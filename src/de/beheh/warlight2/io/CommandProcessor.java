@@ -3,7 +3,7 @@ package de.beheh.warlight2.io;
 import de.beheh.warlight2.bot.Bot;
 import de.beheh.warlight2.bot.command.Command;
 import de.beheh.warlight2.bot.command.NoMovesCommand;
-import de.beheh.warlight2.game.GameTracker;
+import de.beheh.warlight2.game.GameState;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 
@@ -15,10 +15,10 @@ import de.beheh.warlight2.game.map.Region;
  */
 public class CommandProcessor {
 
-	protected GameTracker gameTracker;
+	protected GameState gameTracker;
 	protected Bot bot;
 
-	public CommandProcessor(GameTracker gameTracker, Bot bot) {
+	public CommandProcessor(GameState gameTracker, Bot bot) {
 		this.gameTracker = gameTracker;
 		this.bot = bot;
 	}
@@ -33,7 +33,7 @@ public class CommandProcessor {
 
 	public String pickStartingRegion(Long time, int[] regionIds) {
 		Long start = System.currentTimeMillis();
-		gameTracker.setTime(time);
+		bot.setTime(time);
 		Map map = gameTracker.getMap();
 		Region[] regions = new Region[regionIds.length];
 		for (int i = 0; i < regionIds.length; i++) {
@@ -54,7 +54,7 @@ public class CommandProcessor {
 
 	public String placeArmies(Long time) {
 		Long start = System.currentTimeMillis();
-		gameTracker.setTime(time);
+		bot.setTime(time);
 		Command command = null;
 		try {
 			command = bot.placeArmies(gameTracker.getStartingArmies());
@@ -67,7 +67,7 @@ public class CommandProcessor {
 
 	public String attackTransfer(Long time) {
 		Long start = System.currentTimeMillis();
-		gameTracker.setTime(time);
+		bot.setTime(time);
 		Command command = null;
 		try {
 			command = bot.attackTransfer();

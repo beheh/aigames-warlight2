@@ -1,12 +1,13 @@
 package de.beheh.warlight2.game;
 
 import de.beheh.warlight2.game.map.Map;
+import java.io.Serializable;
 
 /**
  *
  * @author Benedict Etzel
  */
-public class GameTracker {
+public class GameState implements Serializable, Cloneable {
 
 	private long timebank;
 
@@ -46,6 +47,10 @@ public class GameTracker {
 		self = new Player(botName);
 	}
 
+	public void setPlayer(Player player) {
+		this.self = player;
+	}
+
 	public Player getPlayer() {
 		return self;
 	}
@@ -54,6 +59,10 @@ public class GameTracker {
 
 	public void setOpponentName(String opponentName) {
 		opponent = new Player(opponentName);
+	}
+
+	public void setOpponent(Player opponent) {
+		this.opponent = opponent;
 	}
 
 	public Player getOpponent() {
@@ -97,25 +106,24 @@ public class GameTracker {
 		round++;
 	}
 
+	public void setRound(int round) {
+		this.round = round;
+	}
+
 	public int getRound() {
 		return round;
 	}
 
-	long deadline = 0;
-
-	public void setTime(long time) {
-		deadline = System.currentTimeMillis() + time;
-	}
-
-	public long getRemainingTime() {
-		long current = System.currentTimeMillis();
-		if (current >= deadline) {
-			return 0;
-		}
-		return deadline - current;
-	}
-
-	public boolean hasRemainingTime() {
-		return getRemainingTime() > 0;
+	@Override
+	public Object clone() {
+		GameState clone = new GameState();
+		clone.setMap((Map) clone.getMap().clone());
+		clone.setTimebank(timebank);
+		clone.setTimePerMove(timePerMove);
+		clone.setMaxRounds(maxRounds);
+		clone.setPlayer((Player) self.clone());
+		clone.setOpponent((Player) opponent.clone());
+		clone.setRound(round);
+		return clone;
 	}
 }
