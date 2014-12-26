@@ -135,10 +135,4 @@ public class Map implements Cloneable, Serializable {
 		builder.append(")");
 		return builder.toString();
 	}
-
-	@Override
-	public Object clone() {
-		Map clone = new Map((HashMap<Integer, SuperRegion>) superRegions.clone(), (HashMap<Integer, Region>) regions.clone());
-		return clone;
-	}
 }

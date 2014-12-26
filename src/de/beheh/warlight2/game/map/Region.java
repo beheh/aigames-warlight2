@@ -242,5 +242,4 @@ public class Region extends AbstractRegion {
 		}
 		return potentialAttackers;
 	}
-
 }

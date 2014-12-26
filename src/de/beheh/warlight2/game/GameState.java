@@ -113,17 +113,4 @@ public class GameState implements Serializable, Cloneable {
 	public int getRound() {
 		return round;
 	}
-
-	@Override
-	public Object clone() {
-		GameState clone = new GameState();
-		clone.setMap((Map) clone.getMap().clone());
-		clone.setTimebank(timebank);
-		clone.setTimePerMove(timePerMove);
-		clone.setMaxRounds(maxRounds);
-		clone.setPlayer((Player) self.clone());
-		clone.setOpponent((Player) opponent.clone());
-		clone.setRound(round);
-		return clone;
-	}
 }

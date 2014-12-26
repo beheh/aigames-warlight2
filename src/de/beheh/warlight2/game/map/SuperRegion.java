@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Benedict Etzel
  */
-public class SuperRegion extends AbstractRegion {
+public class SuperRegion extends AbstractRegion implements Cloneable {
 
 	protected int bonus;
 
@@ -95,4 +95,5 @@ public class SuperRegion extends AbstractRegion {
 		}
 		return wastelandCount;
 	}
+
 }
