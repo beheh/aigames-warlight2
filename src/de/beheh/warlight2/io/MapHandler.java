@@ -59,24 +59,17 @@ public class MapHandler {
 		}
 	}
 
-	List<Integer> expectedRegionUpdates = new LinkedList<>();
-
-	protected void expectRegionUpdate(int region) {
-		expectedRegionUpdates.add(region);
-	}
+	List<Integer> updatedRegions = new LinkedList<>();
 
 	public void updateMap(String[] parameters) {
+		updatedRegions.clear();
 		Map map = gameTracker.getMap();
 		for (int i = 0; i < parameters.length; i += 3) {
 			int region = Integer.valueOf(parameters[i]);
 			Player owner = gameTracker.getPlayer(parameters[i + 1]);
 			int armies = Integer.valueOf(parameters[i + 2]);
-			expectedRegionUpdates.remove((Integer) region); // does not matter if it isn't expected
+			updatedRegions.add((Integer) region);
 			map.update(region, owner, armies, gameTracker.getRound());
-		}
-		// probably lost control over any non-updated regions
-		for (int region : expectedRegionUpdates) {
-			map.verifyRegionLost(region, gameTracker.getOpponent(), gameTracker.getRound());
 		}
 	}
 
@@ -90,7 +83,9 @@ public class MapHandler {
 			switch (command) {
 				case "attack/transfer":
 					int armyCount = Integer.valueOf(parameters[i + 4]);
-					expectRegionUpdate(to);
+					if(!updatedRegions.contains(to)) {
+						map.verifyRegionLost(to, gameTracker.getOpponent(), gameTracker.getRound());
+					}
 					i++; // attack/transfer are longer by one parameter
 					break;
 				default:
