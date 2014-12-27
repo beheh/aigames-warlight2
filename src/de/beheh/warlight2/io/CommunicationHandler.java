@@ -20,14 +20,14 @@ public class CommunicationHandler {
 	private final PrintWriter writer;
 	private final MapHandler mapHandler;
 	private final GameState gameTracker;
-	private final CommandProcessor requestProcessor;
+	private final CommandProcessor commandProcessor;
 
 	public CommunicationHandler(InputStream input, OutputStream output, MapHandler mapHandler, GameState gameTracker, CommandProcessor requestProcessor) {
 		this.scanner = new Scanner(input);
 		this.writer = new PrintWriter(output);
 		this.mapHandler = mapHandler;
 		this.gameTracker = gameTracker;
-		this.requestProcessor = requestProcessor;
+		this.commandProcessor = requestProcessor;
 	}
 
 	protected static void assertLength(String[] parts, int length) throws IOException {
@@ -101,11 +101,11 @@ public class CommunicationHandler {
 					case "pick_starting_region":
 						// we assume we received the map by now
 						if (!mapReceived) {
-							requestProcessor.mapComplete();
+							commandProcessor.mapComplete();
 							mapReceived = true;
 						}
 						CommunicationHandler.assertLength(parts, 3, 1); // not valid without regions	
-						writer.println(requestProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2)));
+						writer.println(commandProcessor.pickStartingRegion(Long.valueOf(parts[1]), CommunicationHandler.castIntegerParameters(parts, 2)));
 						break;
 					case "settings":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -151,7 +151,7 @@ public class CommunicationHandler {
 						CommunicationHandler.assertLength(parts, 1, 1);
 						// map changes are handled by update map
 						mapHandler.opponentMoves(Arrays.copyOfRange(parts, 1, parts.length)); // check for lost regions
-						requestProcessor.opponentMoves(Arrays.copyOfRange(parts, 1, parts.length)); // notify bot
+						commandProcessor.opponentMoves(Arrays.copyOfRange(parts, 1, parts.length)); // notify bot
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);
@@ -160,16 +160,16 @@ public class CommunicationHandler {
 								// we assume new round
 								gameTracker.nextRound();
 								if (gameTracker.getRound() == 1) {
-									requestProcessor.pickingComplete();
+									commandProcessor.pickingComplete();
 								} else {
-									requestProcessor.roundComplete();
+									commandProcessor.roundComplete();
 								}
 								CommunicationHandler.assertLength(parts, 3);
-								writer.println(requestProcessor.placeArmies(Long.valueOf(parts[2])));
+								writer.println(commandProcessor.placeArmies(Long.valueOf(parts[2])));
 								break;
 							case "attack/transfer":
 								CommunicationHandler.assertLength(parts, 3);
-								writer.println(requestProcessor.attackTransfer(Long.valueOf(parts[2])));
+								writer.println(commandProcessor.attackTransfer(Long.valueOf(parts[2])));
 								break;
 							default:
 								writer.println("unknown command");

@@ -9,6 +9,9 @@ import de.beheh.warlight2.game.map.Border;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
+import de.beheh.warlight2.stats.Scorer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -47,10 +50,7 @@ public class Jive extends Bot {
 	public boolean simulateTakeover(int attackers, int defenders) {
 		defenders = (int) Math.round(simulateDefence(attackers, defenders));
 		attackers = (int) Math.round(simulateAttack(attackers, defenders));
-		if (defenders > 0 || attackers < 1) {
-			return false;
-		}
-		return true;
+		return !(defenders > 0 || attackers < 1);
 	}
 
 	public double simulateAttack(int attackers, int defenders) {
@@ -64,7 +64,6 @@ public class Jive extends Bot {
 	}
 
 	public double simulateDamage(int dealers, double chance) {
-		double something = 0.5;
 		double baseDamage = (chance * dealers * (1 - 0.16d));
 		double bestCase = (dealers * 0.16d);
 		double worstCase = 0;
@@ -73,9 +72,20 @@ public class Jive extends Bot {
 
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
+		if (regions.length < 1) {
+			return null;
+		}
 		// first, pick an easy bonus region with a high distance to other possibilites
+		List<Region> regionList = Arrays.asList(regions);
+		Collections.sort(regionList, new Scorer<Region>() {
 
-		return null;
+			@Override
+			protected double score(Region object) {
+				return 0;
+			}
+
+		});
+		return regionList.get(0);
 	}
 
 	@Override
