@@ -40,36 +40,6 @@ public class Jive extends Bot {
 		return armyBonus;
 	}
 
-	/**
-	 * Returns the chance of a successful region takeover.
-	 *
-	 * @param attackers
-	 * @param defenders
-	 * @return
-	 */
-	public boolean simulateTakeover(int attackers, int defenders) {
-		defenders = (int) Math.round(simulateDefence(attackers, defenders));
-		attackers = (int) Math.round(simulateAttack(attackers, defenders));
-		return !(defenders > 0 || attackers < 1);
-	}
-
-	public double simulateAttack(int attackers, int defenders) {
-		// on average, 70% of defenders destroy an attacker
-		return Math.max(attackers - simulateDamage(defenders, 0.7d), 0);
-	}
-
-	public double simulateDefence(int attackers, int defenders) {
-		// on average, 60% of attackers destroy a defender
-		return Math.max(defenders - simulateDamage(attackers, 0.6d), 0);
-	}
-
-	public double simulateDamage(int dealers, double chance) {
-		double baseDamage = (chance * dealers * (1 - 0.16d));
-		double bestCase = (dealers * 0.16d);
-		double worstCase = 0;
-		return baseDamage + (bestCase - worstCase) / 2;
-	}
-
 	@Override
 	public Region pickStartingRegion(Region[] regions) {
 		if (regions.length < 1) {
