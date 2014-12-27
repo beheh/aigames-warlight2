@@ -50,8 +50,9 @@ public class Jive extends Bot {
 		Collections.sort(regionList, new Scorer<Region>() {
 
 			@Override
-			protected double score(Region object) {
-				return 0;
+			protected double score(Region region) {
+				SuperRegion superRegion = region.getSuperRegion();
+				return superRegion.getBonus() * (1d / superRegion.getRegionCount());
 			}
 
 		});
@@ -78,12 +79,6 @@ public class Jive extends Bot {
 		return command;
 	}
 
-	// determine maximum amount of troops needed per border segment
-	// prioritize
-	// also: ranking with percentages
-	// if we have Scores 40, 40, 20, split our units
-	// find highest target along border
-	// predict threats
 	protected List<Border> borderGroups = null;
 
 	public void updateBorders() {
