@@ -9,9 +9,12 @@ import de.beheh.warlight2.game.map.Border;
 import de.beheh.warlight2.game.map.Map;
 import de.beheh.warlight2.game.map.Region;
 import de.beheh.warlight2.game.map.SuperRegion;
+import de.beheh.warlight2.stats.Navigation;
 import de.beheh.warlight2.stats.Scorer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -52,7 +55,12 @@ public class Jive extends Bot {
 			@Override
 			protected double score(Region region) {
 				SuperRegion superRegion = region.getSuperRegion();
-				return superRegion.getBonus() * (1d / superRegion.getRegionCount());
+				int rounds = Math.max(Navigation.roundsToConquerSuperRegion(region, 30, 5) + 1, 1);
+				if (rounds == 30) {
+					// maximum reached
+					System.err.println("Jive: pickStartingRegion couldn't conquer region " + region + " in " + rounds + " round(s)");
+				}
+				return superRegion.getBonus() * (1d / rounds);
 			}
 
 		});
