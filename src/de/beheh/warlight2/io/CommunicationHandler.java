@@ -155,8 +155,11 @@ public class CommunicationHandler {
 						break;
 					case "go":
 						CommunicationHandler.assertLength(parts, 2, 1);
+						long startTime = System.currentTimeMillis();
+						long remainingTime = Long.valueOf(parts[2]);
 						switch (parts[1]) {
 							case "place_armies":
+								CommunicationHandler.assertLength(parts, 3);
 								// we assume new round
 								gameTracker.nextRound();
 								if (gameTracker.getRound() == 1) {
@@ -164,12 +167,12 @@ public class CommunicationHandler {
 								} else {
 									commandProcessor.roundComplete();
 								}
-								CommunicationHandler.assertLength(parts, 3);
-								writer.println(commandProcessor.placeArmies(Long.valueOf(parts[2])));
+								remainingTime -= System.currentTimeMillis() - startTime;
+								writer.println(commandProcessor.placeArmies(remainingTime));
 								break;
 							case "attack/transfer":
 								CommunicationHandler.assertLength(parts, 3);
-								writer.println(commandProcessor.attackTransfer(Long.valueOf(parts[2])));
+								writer.println(commandProcessor.attackTransfer(remainingTime));
 								break;
 							default:
 								writer.println("unknown command");
