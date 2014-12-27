@@ -75,9 +75,9 @@ public class Region extends AbstractRegion {
 		return neighbors.contains(neighbor);
 	}
 
-	protected int armycount = 0;
+	protected Integer armycount = null;
 
-	public void setArmyCount(int armies) {
+	public void setArmyCount(Integer armies) {
 		this.armycount = armies;
 	}
 
@@ -100,7 +100,7 @@ public class Region extends AbstractRegion {
 		armycount -= by;
 	}
 
-	public int getArmyCount() {
+	public Integer getArmyCount() {
 		return armycount;
 	}
 

@@ -51,10 +51,11 @@ public class Map implements Cloneable, Serializable {
 	}
 
 	public void setRegionAsWasteland(int id) {
-		regions.get(id).setWasteland(true);
+		Region region = regions.get(id);
+		region.setWasteland(true);
 	}
 
-	public void update(int id, Player owner, int armycount, int round) {
+	public void update(int id, Player owner, Integer armycount, int round) {
 		Region region = regions.get(id);
 		region.setOwner(owner);
 		region.setArmyCount(armycount);
