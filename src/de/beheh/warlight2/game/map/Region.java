@@ -75,10 +75,10 @@ public class Region extends AbstractRegion {
 		return neighbors.contains(neighbor);
 	}
 
-	protected Integer armycount = null;
+	protected Integer armyCount = null;
 
 	public void setArmyCount(Integer armies) {
-		this.armycount = armies;
+		this.armyCount = armies;
 	}
 
 	protected int schedule = 0;
@@ -88,24 +88,27 @@ public class Region extends AbstractRegion {
 	}
 
 	public void commitSchedule() {
-		armycount += schedule;
+		if(armyCount == null) {
+			armyCount = 0;
+		}
+		armyCount += schedule;
 		schedule = 0;
 	}
 
 	public void increaseArmy(int by) {
-		armycount += by;
+		armyCount += by;
 	}
 
 	public void decreaseArmy(int by) {
-		armycount -= by;
+		armyCount -= by;
 	}
 
 	public Integer getArmyCount() {
-		return armycount;
+		return armyCount;
 	}
 
 	public int getScheduledArmyCount() {
-		return armycount + schedule;
+		return armyCount + schedule;
 	}
 
 	public void resetSchedule() {
