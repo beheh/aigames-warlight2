@@ -41,7 +41,7 @@ public class CommandProcessor {
 		}
 		try {
 			Region region = bot.pickStartingRegion(regions);
-			System.err.println(getClass().getSimpleName() + ": pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			System.err.println(getClass().getSimpleName() + ": pickStartingRegion took " + (System.currentTimeMillis() - start) + "ms/" + gameTracker.getTimePerMove() + "ms (timebank = " + time + "ms)");
 			if (region != null) {
 				return region.toString();
 			}
@@ -58,7 +58,7 @@ public class CommandProcessor {
 		Command command = null;
 		try {
 			command = bot.placeArmies(gameTracker.getStartingArmies());
-			System.err.println(getClass().getSimpleName() + ": placeArmies in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			System.err.println(getClass().getSimpleName() + ": placeArmies in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms/" + gameTracker.getTimePerMove() + "ms (timebank - setup = " + time + "ms)");
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -71,7 +71,7 @@ public class CommandProcessor {
 		Command command = null;
 		try {
 			command = bot.attackTransfer();
-			System.err.println(getClass().getSimpleName() + ": attackTransfer in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms (had " + time + "ms)");
+			System.err.println(getClass().getSimpleName() + ": attackTransfer in round #" + gameTracker.getRound() + " took " + (System.currentTimeMillis() - start) + "ms/" + gameTracker.getTimePerMove() + "ms (timebank - setup = " + time + "ms)");
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
