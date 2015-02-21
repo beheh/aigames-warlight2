@@ -79,6 +79,16 @@ public class GameState implements Serializable, Cloneable {
 		return startingArmies;
 	}
 
+	protected int startingPickAmount;
+
+	public void setStartingPickAmount(int startingPickAmount) {
+		this.startingPickAmount = startingPickAmount;
+	}
+
+	public int getStartingPickAmount() {
+		return startingPickAmount;
+	}
+
 	protected Map map = new Map();
 
 	public void setMap(Map map) {

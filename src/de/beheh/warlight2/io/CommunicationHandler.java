@@ -138,6 +138,10 @@ public class CommunicationHandler {
 							case "starting_regions":
 								//@todo implement starting_regions
 								break;
+							case "starting_pick_amount":
+								CommunicationHandler.assertLength(parts, 3);
+								gameTracker.setStartingPickAmount(Integer.valueOf(parts[2]));
+								break;
 							default:
 								CommunicationHandler.unknownCommand(parts[1]);
 								break;

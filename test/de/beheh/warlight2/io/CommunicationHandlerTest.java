@@ -78,6 +78,7 @@ public class CommunicationHandlerTest {
 				+ "setup_map wastelands 3\n"
 				+ "pick_starting_region 10000 2 4\n"
 				+ "settings starting_armies 7\n"
+				+ "settings starting_pick_amount 1\n"
 				+ "update_map 1 player1 2 2 player1 4 3 neutral 10 4 player2 5\n"
 				+ "go place_armies 10000\n"
 				+ "go attack/transfer 10000\n").getBytes();
