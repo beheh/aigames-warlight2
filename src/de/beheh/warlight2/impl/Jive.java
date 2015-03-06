@@ -58,7 +58,7 @@ public class Jive extends Bot {
 				int rounds = Math.max(Navigation.roundsToConquerSuperRegion(region, 30, 5) + 1, 1);
 				if (rounds == 30) {
 					// maximum reached
-					System.err.println("Jive: pickStartingRegion couldn't conquer region " + region + " in " + rounds + " round(s)");
+					System.err.println("Jive: pickStartingRegion couldn't conquer super region " + superRegion + " (starting from region " + region + ") in " + rounds + " round(s)");
 				}
 				return superRegion.getBonus() * (1d / rounds);
 			}
@@ -70,6 +70,8 @@ public class Jive extends Bot {
 	@Override
 	public PlaceArmiesCommand placeArmies(int armyCount) {
 		PlaceArmiesCommand command = new PlaceArmiesCommand(gameState);
+
+		// split armies?
 
 		return command;
 	}
