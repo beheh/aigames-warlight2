@@ -90,7 +90,7 @@ public class Foxtrot extends Bot {
 
 		@Override
 		protected double score(Region region) {
-			if (region.isNeutral() || region.getArmyCount() == null) {
+			if (region.isNeutral()) {
 				return 0;
 			}
 			return region.getArmyCount() - region.getPotentialAttackers();

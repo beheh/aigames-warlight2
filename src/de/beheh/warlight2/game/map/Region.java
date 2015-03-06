@@ -88,6 +88,7 @@ public class Region extends AbstractRegion {
 	}
 
 	public void commitSchedule() {
+		System.err.println("Region: committing schedule on empty region (invalid assumption)");
 		if(armyCount == null) {
 			armyCount = 0;
 		}
@@ -103,12 +104,20 @@ public class Region extends AbstractRegion {
 		armyCount -= by;
 	}
 
-	public Integer getArmyCount() {
+	public int getArmyCount() {
+		if(armyCount == null) {
+			if(wasteland) {
+				return 6;
+			}
+			else {
+				return 2;
+			}
+		}
 		return armyCount;
 	}
 
 	public int getScheduledArmyCount() {
-		return armyCount + schedule;
+		return getArmyCount() + schedule;
 	}
 
 	public void resetSchedule() {
