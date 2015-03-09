@@ -23,9 +23,9 @@ import java.util.Queue;
  *
  * @author Benedict Etzel
  */
-public class Jive extends Bot {
+public class Samba extends Bot {
 
-	public Jive(GameState gameTracker) {
+	public Samba(GameState gameTracker) {
 		super(gameTracker);
 	}
 
@@ -84,8 +84,8 @@ public class Jive extends Bot {
 
 		// if worst case is favorable -> attack
 		for (Region region : map.getRegionsByPlayer(gameState.getPlayer())) {
-
 		}
+
 		return command;
 	}
 
@@ -141,7 +141,7 @@ public class Jive extends Bot {
 				builder.append(", ");
 			}
 			builder.append(border);
-			builder.append(" (encloses " + border.getEnclosedRegions().size() + " regions)");
+			builder.append(" (encloses ").append(border.getEnclosedRegions().size()).append(" regions)");
 		}
 		System.err.println(getClass().getSimpleName() + ": detected " + borderGroups.size() + " border group(s): " + builder.toString());
 	}

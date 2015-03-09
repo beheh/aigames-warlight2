@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  *
  * @author Benedict Etzel
  */
-public class JiveTest {
+public class SambaTest {
 
 	/**
 	 * Test of pickStartingRegion method, of class Jive.
@@ -21,7 +21,7 @@ public class JiveTest {
 	@Test
 	public void testPickStartingRegion() {
 		System.out.println("pickStartingRegion");
-		Jive jive = new Jive(new GameState());
+		Samba jive = new Samba(new GameState());
 
 		SuperRegion[] super1 = new SuperRegion[]{new SuperRegion(1, 10), new SuperRegion(2, 0)};
 		Region[] regions1 = new Region[]{new Region(1, super1[0]), new Region(2, super1[1])};
